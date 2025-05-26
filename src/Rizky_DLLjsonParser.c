@@ -1,4 +1,4 @@
-#include "include/Rizky_DLLjsonParser.h"
+#include "../include/Rizky_DLLjsonParser.h"
 
 MaxHeap* create_heap(int capacity) {
     MaxHeap* heap = (MaxHeap*)malloc(sizeof(MaxHeap));

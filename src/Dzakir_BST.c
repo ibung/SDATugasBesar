@@ -1,4 +1,4 @@
-#include "include/Dzakir_BST.h"
+#include "../include/Dzakir_BST.h"
 
 BST_Node* create_bst_node(const char* field) {
     BST_Node* node = (BST_Node*)malloc(sizeof(BST_Node));

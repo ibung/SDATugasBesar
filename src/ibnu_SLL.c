@@ -1,4 +1,4 @@
-#include "include/Ibnu_SLL.h"
+#include "../include/Ibnu_SLL.h"
 
 Citation* create_citation(const char* paper_id, const char* title) {
     Citation* citation = (Citation*)malloc(sizeof(Citation));
