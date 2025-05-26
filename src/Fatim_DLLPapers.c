@@ -70,3 +70,63 @@ void sort_by_citations(Paper** head) {
         lptr = ptr1;
     } while (swapped);
 }
+
+void insert_paper_end(Paper** head, Paper* new_paper) {
+    if (*head == NULL) {
+        *head = new_paper;
+        return;
+    }
+    
+    Paper* current = *head;
+    // Traverse ke akhir list
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    
+    // Insert di akhir
+    current->next = new_paper;
+    new_paper->prev = current;
+    new_paper->next = NULL;
+}
+
+// Fungsi untuk menampilkan semua papers dalam list
+void display_papers(Paper* head) {
+    if (head == NULL) {
+        printf("No papers found.\n");
+        return;
+    }
+    
+    printf("\n========== PAPERS LIST ==========\n");
+    Paper* current = head;
+    int count = 1;
+    
+    while (current != NULL) {
+        printf("%d. Title: %s\n", count, current->title);
+        printf("   Field: %s\n", current->field_of_study);
+        printf("   Year: %d\n", current->year);
+        printf("   Citations: %d\n", current->citation_count);
+        printf("   --------------------------------\n");
+        
+        current = current->next;
+        count++;
+    }
+    printf("Total papers: %d\n\n", count - 1);
+}
+
+// Fungsi untuk membebaskan semua memori dalam linked list papers
+void free_papers_list(Paper* head) {
+    Paper* current = head;
+    Paper* next_paper;
+    
+    while (current != NULL) {
+        next_paper = current->next;
+        
+        // TODO: Free citations linked list jika ada
+        // Ini tergantung implementasi struct Citation
+        // Contoh: free_citations_list(current->citations_head);
+        
+        // Free current paper
+        free(current);
+        current = next_paper;
+    }
+}

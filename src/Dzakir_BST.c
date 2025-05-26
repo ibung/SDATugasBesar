@@ -35,3 +35,37 @@ BST_Node* search_field(BST_Node* root, const char* field) {
     
     return search_field(root->right, field);
 }
+
+// Fungsi untuk traversal inorder BST
+void inorder_traversal(BST_Node* root) {
+    if (root != NULL) {
+        inorder_traversal(root->left);
+        printf("Field: %s\n", root->field);
+        
+        // Jika ada papers yang terkait dengan field ini, bisa ditampilkan juga
+        // (tergantung implementasi struct Paper)
+        if (root->papers_head != NULL) {
+            printf("  - Has associated papers\n");
+        }
+        
+        inorder_traversal(root->right);
+    }
+}
+
+// Fungsi untuk membebaskan seluruh memori BST
+void free_bst(BST_Node* root) {
+    if (root != NULL) {
+        // Rekursif free left subtree
+        free_bst(root->left);
+        
+        // Rekursif free right subtree  
+        free_bst(root->right);
+        
+        // TODO: Free linked list papers jika ada
+        // Ini tergantung implementasi struct Paper dan linked list-nya
+        // Contoh: free_papers_list(root->papers_head);
+        
+        // Free node saat ini
+        free(root);
+    }
+}
