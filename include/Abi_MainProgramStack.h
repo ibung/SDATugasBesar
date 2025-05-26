@@ -1,10 +1,9 @@
-#ifndef MENU_STACK_H
-#define MENU_STACK_H
+#ifndef ABI_MAINPROGRAMSTACK_H
+#define ABI_MAINPROGRAMSTACK_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
 typedef struct MenuStack {
     int menu_id;
@@ -12,6 +11,7 @@ typedef struct MenuStack {
     struct MenuStack* next;
 } MenuStack;
 
+// Function declarations
 void push_menu(MenuStack** top, int id, const char* name);
 MenuStack* pop_menu(MenuStack** top);
 void display_menu_history(MenuStack* top);

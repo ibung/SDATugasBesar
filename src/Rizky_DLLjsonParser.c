@@ -1,4 +1,5 @@
 #include "../include/Rizky_DLLjsonParser.h"
+#include <ctype.h>
 
 MaxHeap* create_heap(int capacity) {
     MaxHeap* heap = (MaxHeap*)malloc(sizeof(MaxHeap));
@@ -41,13 +42,11 @@ Paper* extract_max(MaxHeap* heap) {
     return max_paper;
 }
 
-// Fungsi untuk heapify down (menjaga properti max heap dari atas ke bawah)
 void heapify_down(MaxHeap* heap, int index) {
     int largest = index;
     int left = 2 * index + 1;
     int right = 2 * index + 2;
     
-    // Cari yang terbesar antara parent, left child, dan right child
     if (left < heap->size && 
         heap->papers[left]->citation_count > heap->papers[largest]->citation_count) {
         largest = left;
@@ -58,7 +57,6 @@ void heapify_down(MaxHeap* heap, int index) {
         largest = right;
     }
     
-    // Jika largest bukan parent, swap dan lanjutkan heapify
     if (largest != index) {
         Paper* temp = heap->papers[index];
         heap->papers[index] = heap->papers[largest];
@@ -68,20 +66,128 @@ void heapify_down(MaxHeap* heap, int index) {
     }
 }
 
-// Fungsi untuk membebaskan memori heap
 void free_heap(MaxHeap* heap) {
     if (heap == NULL) return;
     
-    // Free array of paper pointers
     if (heap->papers != NULL) {
         free(heap->papers);
     }
     
-    // Free heap structure
     free(heap);
 }
 
-// Fungsi untuk parsing file JSON dan mengisi array papers
+// Helper function to skip whitespace
+char* skip_whitespace(char* str) {
+    while (*str && isspace(*str)) {
+        str++;
+    }
+    return str;
+}
+
+// Helper function to find the next occurrence of a character, considering escape sequences
+char* find_next_char(char* str, char target) {
+    while (*str) {
+        if (*str == '\\') {
+            str += 2; // Skip escaped character
+            continue;
+        }
+        if (*str == target) {
+            return str;
+        }
+        str++;
+    }
+    return NULL;
+}
+
+// Helper function to extract string value from JSON
+int extract_json_string(const char* json, const char* key, char* output, int max_len) {
+    char search_pattern[256];
+    snprintf(search_pattern, sizeof(search_pattern), "\"%s\":", key);
+    
+    char* key_pos = strstr(json, search_pattern);
+    if (!key_pos) return 0;
+    
+    // Move to the value part
+    char* value_start = key_pos + strlen(search_pattern);
+    value_start = skip_whitespace(value_start);
+    
+    if (*value_start != '"') return 0; // Not a string value
+    
+    value_start++; // Skip opening quote
+    char* value_end = find_next_char(value_start, '"');
+    if (!value_end) return 0;
+    
+    int len = value_end - value_start;
+    if (len >= max_len) len = max_len - 1;
+    
+    strncpy(output, value_start, len);
+    output[len] = '\0';
+    
+    return 1;
+}
+
+// Helper function to extract integer value from JSON
+int extract_json_int(const char* json, const char* key, int* output) {
+    char search_pattern[256];
+    snprintf(search_pattern, sizeof(search_pattern), "\"%s\":", key);
+    
+    char* key_pos = strstr(json, search_pattern);
+    if (!key_pos) return 0;
+    
+    // Move to the value part
+    char* value_start = key_pos + strlen(search_pattern);
+    value_start = skip_whitespace(value_start);
+    
+    *output = atoi(value_start);
+    return 1;
+}
+
+// Helper function to extract array and count elements
+int count_json_array_elements(const char* json, const char* key) {
+    char search_pattern[256];
+    snprintf(search_pattern, sizeof(search_pattern), "\"%s\":", key);
+    
+    char* key_pos = strstr(json, search_pattern);
+    if (!key_pos) return 0;
+    
+    char* array_start = key_pos + strlen(search_pattern);
+    array_start = skip_whitespace(array_start);
+    
+    if (*array_start != '[') return 0;
+    
+    array_start++; // Skip opening bracket
+    array_start = skip_whitespace(array_start);
+    
+    if (*array_start == ']') return 0; // Empty array
+    
+    int count = 1; // At least one element
+    int bracket_depth = 0;
+    int in_string = 0;
+    
+    while (*array_start && (*array_start != ']' || bracket_depth > 0)) {
+        if (*array_start == '\\' && in_string) {
+            array_start += 2; // Skip escaped character
+            continue;
+        }
+        
+        if (*array_start == '"') {
+            in_string = !in_string;
+        } else if (!in_string) {
+            if (*array_start == '[') {
+                bracket_depth++;
+            } else if (*array_start == ']') {
+                bracket_depth--;
+            } else if (*array_start == ',' && bracket_depth == 0) {
+                count++;
+            }
+        }
+        array_start++;
+    }
+    
+    return count;
+}
+
+// Updated function to parse JSON file with the new format
 int parse_json_file(const char* filename, Paper** papers_array, int max_papers) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
@@ -89,18 +195,88 @@ int parse_json_file(const char* filename, Paper** papers_array, int max_papers) 
         return 0;
     }
     
-    char line[1024];
-    int paper_count = 0;
+    // Read entire file into memory
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
     
-    while (fgets(line, sizeof(line), file) && paper_count < max_papers) {
-        // Skip empty lines or lines that don't contain paper data
-        if (strlen(line) < 10) continue;
+    char* json_content = (char*)malloc(file_size + 1);
+    if (!json_content) {
+        printf("Error: Memory allocation failed\n");
+        fclose(file);
+        return 0;
+    }
+    
+    fread(json_content, 1, file_size, file);
+    json_content[file_size] = '\0';
+    fclose(file);
+    
+    int paper_count = 0;
+    char* current_pos = json_content;
+    
+    // Find the start of the array
+    char* array_start = strchr(current_pos, '[');
+    if (!array_start) {
+        printf("Error: Invalid JSON format - no array found\n");
+        free(json_content);
+        return 0;
+    }
+    
+    current_pos = array_start + 1;
+    
+    // Parse each paper object
+    while (paper_count < max_papers) {
+        // Skip whitespace
+        current_pos = skip_whitespace(current_pos);
         
-        // Create new paper
+        // Check for end of array
+        if (*current_pos == ']') break;
+        
+        // Find the start of the next object
+        if (*current_pos == ',') {
+            current_pos++;
+            current_pos = skip_whitespace(current_pos);
+        }
+        
+        if (*current_pos != '{') {
+            if (*current_pos == ']') break;
+            current_pos++;
+            continue;
+        }
+        
+        // Find the end of this object
+        int brace_count = 1;
+        char* object_start = current_pos;
+        char* object_end = current_pos + 1;
+        int in_string = 0;
+        
+        while (*object_end && brace_count > 0) {
+            if (*object_end == '\\' && in_string) {
+                object_end += 2;
+                continue;
+            }
+            
+            if (*object_end == '"') {
+                in_string = !in_string;
+            } else if (!in_string) {
+                if (*object_end == '{') {
+                    brace_count++;
+                } else if (*object_end == '}') {
+                    brace_count--;
+                }
+            }
+            object_end++;
+        }
+        
+        // Extract paper data from this object
+        int object_len = object_end - object_start;
+        char* paper_json = (char*)malloc(object_len + 1);
+        strncpy(paper_json, object_start, object_len);
+        paper_json[object_len] = '\0';
+        
+        // Create new paper and extract data
         Paper* paper = (Paper*)malloc(sizeof(Paper));
-        
-        // Extract data from JSON line
-        extract_paper_data(line, paper);
+        extract_paper_data(paper_json, paper);
         
         // Initialize paper's linked list fields
         paper->citations_head = NULL;
@@ -109,13 +285,17 @@ int parse_json_file(const char* filename, Paper** papers_array, int max_papers) 
         
         papers_array[paper_count] = paper;
         paper_count++;
+        
+        free(paper_json);
+        current_pos = object_end;
     }
     
-    fclose(file);
+    free(json_content);
+    printf("Successfully parsed %d papers from JSON file.\n", paper_count);
     return paper_count;
 }
 
-// Fungsi untuk mengekstrak data paper dari baris JSON
+// Updated function to extract paper data from JSON object
 void extract_paper_data(const char* json_line, Paper* paper) {
     // Initialize default values
     strcpy(paper->title, "Unknown Title");
@@ -123,40 +303,27 @@ void extract_paper_data(const char* json_line, Paper* paper) {
     paper->year = 0;
     paper->citation_count = 0;
     
-    // Simple JSON parsing (basic implementation)
-    // Cari "title": "..."
-    char* title_start = strstr(json_line, "\"title\":");
-    if (title_start != NULL) {
-        title_start = strchr(title_start, '"');
-        if (title_start != NULL) {
-            title_start = strchr(title_start + 1, '"');
-            if (title_start != NULL) {
-                title_start++; // Skip opening quote
-                char* title_end = strchr(title_start, '"');
-                if (title_end != NULL) {
-                    int title_len = title_end - title_start;
-                    if (title_len < 255) {
-                        strncpy(paper->title, title_start, title_len);
-                        paper->title[title_len] = '\0';
-                    }
-                }
-            }
-        }
-    }
+    // Extract title
+    extract_json_string(json_line, "title", paper->title, sizeof(paper->title));
     
-    // Cari "field_of_study": "..."
-    char* field_start = strstr(json_line, "\"field_of_study\":");
-    if (field_start != NULL) {
-        field_start = strchr(field_start, '"');
-        if (field_start != NULL) {
-            field_start = strchr(field_start + 1, '"');
-            if (field_start != NULL) {
-                field_start++; // Skip opening quote
-                char* field_end = strchr(field_start, '"');
-                if (field_end != NULL) {
-                    int field_len = field_end - field_start;
-                    if (field_len < 99) {
-                        strncpy(paper->field_of_study, field_start, field_len);
+    // Extract year
+    extract_json_int(json_line, "year", &paper->year);
+    
+    // Extract field of study (first field from fieldsOfStudy array)
+    char* fields_start = strstr(json_line, "\"fieldsOfStudy\":");
+    if (fields_start) {
+        fields_start = strchr(fields_start, '[');
+        if (fields_start) {
+            fields_start++; // Skip opening bracket
+            fields_start = skip_whitespace(fields_start);
+            
+            if (*fields_start == '"') {
+                fields_start++; // Skip opening quote
+                char* field_end = find_next_char(fields_start, '"');
+                if (field_end) {
+                    int field_len = field_end - fields_start;
+                    if (field_len < sizeof(paper->field_of_study)) {
+                        strncpy(paper->field_of_study, fields_start, field_len);
                         paper->field_of_study[field_len] = '\0';
                     }
                 }
@@ -164,19 +331,10 @@ void extract_paper_data(const char* json_line, Paper* paper) {
         }
     }
     
-    // Cari "year": value
-    char* year_start = strstr(json_line, "\"year\":");
-    if (year_start != NULL) {
-        year_start += 7; // Skip "year":
-        while (*year_start == ' ' || *year_start == '\t') year_start++; // Skip whitespace
-        paper->year = atoi(year_start);
-    }
+    // Count citations from inCitations array
+    paper->citation_count = count_json_array_elements(json_line, "inCitations");
     
-    // Cari "citation_count": value
-    char* citation_start = strstr(json_line, "\"citation_count\":");
-    if (citation_start != NULL) {
-        citation_start += 17; // Skip "citation_count":
-        while (*citation_start == ' ' || *citation_start == '\t') citation_start++; // Skip whitespace
-        paper->citation_count = atoi(citation_start);
-    }
+    // Debug output
+    printf("Parsed: %s | Field: %s | Year: %d | Citations: %d\n", 
+           paper->title, paper->field_of_study, paper->year, paper->citation_count);
 }
