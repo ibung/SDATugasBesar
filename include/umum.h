@@ -8,6 +8,7 @@
 typedef struct Citation {
     char citing_paper_id[50];
     char citing_paper_title[256];
+    int citation_count;
     struct Citation* next;
 } Citation;
 

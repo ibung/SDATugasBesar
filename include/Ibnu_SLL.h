@@ -4,7 +4,7 @@
 #include "umum.h"
 
 // Function declarations
-Citation* create_citation(const char* paper_id, const char* title);
+Citation* create_citation(const char* paper_id, const char* title, int citation_count);
 void add_citation(Citation** head, Citation* new_citation);
 int count_citations(Citation* head);
 Citation* merge_sort_citations(Citation* head);
