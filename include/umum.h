@@ -22,4 +22,21 @@ typedef struct Paper {
     struct Paper* prev;
 } Paper;
 
+// New structures for pagination
+typedef struct PaginationTab {
+    int tab_number;
+    Paper* papers[10];  // Maximum 10 papers per tab
+    int paper_count;    // Actual number of papers in this tab
+    struct PaginationTab* next;
+    struct PaginationTab* prev;
+} PaginationTab;
+
+typedef struct PaginationSystem {
+    PaginationTab* first_tab;
+    PaginationTab* last_tab;
+    PaginationTab* current_tab;
+    int total_tabs;
+    int total_papers;
+} PaginationSystem;
+
 #endif

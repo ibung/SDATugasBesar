@@ -458,7 +458,7 @@ void enhanced_search_by_field() {
     
     // Option 1: Regular sorting
     printf("\n1. View with regular sorting\n");
-    printf("2. View top N papers (using heap)\n");
+    printf("2. View top N papers (using heap with pagination)\n");
     printf("3. View with citation network analysis\n");
     printf("Choose view option: ");
     
@@ -498,33 +498,60 @@ void enhanced_search_by_field() {
         }
         
         case 2: {
-            // Top N using heap
+            // Top N using heap with pagination
             int top_n;
             printf("Enter number of top papers: ");
             scanf("%d", &top_n);
             getchar();
             
-            MaxHeap* heap = create_heap(100);
+            // Count total papers in this field first
+            int total_papers_in_field = 0;
+            Paper* counter = node->papers_head;
+            while (counter != NULL) {
+                total_papers_in_field++;
+                counter = counter->next;
+            }
+            
+            if (top_n > total_papers_in_field) {
+                top_n = total_papers_in_field;
+                printf("Adjusted to show all %d papers in this field.\n", total_papers_in_field);
+            }
+            
+            // Create heap with sufficient capacity
+            MaxHeap* heap = create_heap(total_papers_in_field);
             Paper* current = node->papers_head;
             
+            // Insert all papers into heap
             while (current != NULL) {
                 insert_heap(heap, current);
                 current = current->next;
             }
             
-            printf("\nTop %d papers in %s:\n", top_n, field);
+            // Extract top N papers and store in array
+            Paper** top_papers = (Paper**)malloc(top_n * sizeof(Paper*));
             for (int i = 0; i < top_n && heap->size > 0; i++) {
-                Paper* top_paper = extract_max(heap);
-                printf("%d. %s (Citations: %d, Year: %d)\n", 
-                       i+1, top_paper->title, top_paper->citation_count, top_paper->year);
+                top_papers[i] = extract_max(heap);
             }
             
+            // Convert to pagination system
+            PaginationSystem* pagination = convert_papers_to_pagination(top_papers, top_n);
+            
+            printf("\n=== TOP %d PAPERS IN %s (PAGINATED VIEW) ===\n", top_n, field);
+            printf("Total tabs: %d (10 papers per tab)\n", pagination->total_tabs);
+            printf("Use navigation to browse through tabs.\n");
+            
+            // Start pagination interface
+            navigate_pagination(pagination);
+            
+            // Cleanup
+            free_pagination_system(pagination);
+            free(top_papers);
             free_heap(heap);
             break;
         }
         
         case 3: {
-            // Citation network analysis for this field
+            // Citation network analysis for this field (unchanged)
             Citation* field_citations = NULL;
             Paper* current = node->papers_head;
             char citation_id[20];
