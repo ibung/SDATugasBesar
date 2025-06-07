@@ -19,11 +19,12 @@ void generate_field_stats_recursive(BST_Node* root);
 void display_sorting_menu();
 void initialize_sample_data();
 void load_json_data();
+void display_json_data();
 void display_all_papers_with_sorting();
 
 void display_main_menu() {
     printf("\n=== ENHANCED ACADEMIC PAPER SORTER ===\n");
-    printf("1. Load data from JSON\n");
+    printf("1. Display JSON data\n");
     printf("2. Search papers by field of study\n");
     printf("3. Display all fields\n");
     printf("4. Display all papers with sorting\n");
@@ -98,9 +99,9 @@ void initialize_sample_data() {
     printf("Sample data initialized successfully!\n");
 }
 
+// Function untuk load data JSON saja (tanpa output)
 void load_json_data() {
     char filename[256];
-    // Langsung set filename ke "data.json"
     strcpy(filename, "data/data.json");
 
     // Array to store parsed papers
@@ -108,8 +109,7 @@ void load_json_data() {
     int paper_count = parse_json_file(filename, papers_array, 1000);
     
     if (paper_count == 0) {
-        printf("No papers were loaded from the JSON file.\n");
-        return;
+        return; // Tidak ada output di sini
     }
     
     // Clear existing data
@@ -137,8 +137,33 @@ void load_json_data() {
             insert_paper_end(&field_node->papers_head, field_paper);
         }
     }
+}
+
+// Function untuk menampilkan data JSON
+void display_json_data() {
+    if (all_papers_head == NULL) {
+        printf("No JSON data loaded. Please check if data.json exists and is properly formatted.\n");
+        return;
+    }
     
-    printf("Successfully loaded %d papers and organized by fields.\n", paper_count);
+    // Count total papers
+    int total_papers = 0;
+    Paper* counter = all_papers_head;
+    while (counter != NULL) {
+        total_papers++;
+        counter = counter->next;
+    }
+    
+    printf("\n=== JSON DATA DISPLAY ===\n");
+    printf("Successfully loaded %d papers from JSON file.\n", total_papers);
+    printf("Papers have been organized by fields.\n\n");
+    
+    // Display all papers
+    printf("All papers from JSON:\n");
+    printf("====================\n");
+    display_papers(all_papers_head);
+    
+    printf("\nData loading completed successfully!\n");
 }
 
 void display_all_papers_with_sorting() {
@@ -598,6 +623,9 @@ int main() {
     // Initialize with sample data
     initialize_sample_data();
     
+    // Automatically load JSON data at startup (silent)
+    load_json_data();
+    
     while (1) {
         display_main_menu();
         scanf("%d", &choice);
@@ -605,8 +633,8 @@ int main() {
         
         switch (choice) {
             case 1:
-                push_menu(&menu_history, 1, "Load JSON Data");
-                load_json_data();
+                push_menu(&menu_history, 1, "Display JSON Data");
+                display_json_data();
                 break;
             case 2:
                 push_menu(&menu_history, 2, "Enhanced Search by Field");
