@@ -46,59 +46,6 @@ void display_sorting_menu() {
     printf("Choose sorting option: ");
 }
 
-void initialize_sample_data() {
-    printf("Initializing sample data...\n");
-    
-    // Create some sample papers
-    Paper* paper1 = create_paper("Machine Learning in Healthcare", "Computer Science", 2020, 150);
-    Paper* paper2 = create_paper("Quantum Computing Algorithms", "Physics", 2019, 89);
-    Paper* paper3 = create_paper("Climate Change Modeling", "Environmental Science", 2021, 234);
-    Paper* paper4 = create_paper("Neural Networks for NLP", "Computer Science", 2022, 178);
-    Paper* paper5 = create_paper("Renewable Energy Systems", "Engineering", 2020, 92);
-    
-    // Add to main papers list
-    insert_paper_end(&all_papers_head, paper1);
-    insert_paper_end(&all_papers_head, paper2);
-    insert_paper_end(&all_papers_head, paper3);
-    insert_paper_end(&all_papers_head, paper4);
-    insert_paper_end(&all_papers_head, paper5);
-    
-    // Build field index (BST)
-    field_index = insert_field(field_index, "Computer Science");
-    field_index = insert_field(field_index, "Physics");
-    field_index = insert_field(field_index, "Environmental Science");
-    field_index = insert_field(field_index, "Engineering");
-    
-    // Add papers to their respective fields in BST
-    BST_Node* cs_node = search_field(field_index, "Computer Science");
-    if (cs_node) {
-        Paper* cs_paper1 = create_paper("Machine Learning in Healthcare", "Computer Science", 2020, 150);
-        Paper* cs_paper2 = create_paper("Neural Networks for NLP", "Computer Science", 2022, 178);
-        insert_paper_end(&cs_node->papers_head, cs_paper1);
-        insert_paper_end(&cs_node->papers_head, cs_paper2);
-    }
-    
-    BST_Node* physics_node = search_field(field_index, "Physics");
-    if (physics_node) {
-        Paper* physics_paper = create_paper("Quantum Computing Algorithms", "Physics", 2019, 89);
-        insert_paper_end(&physics_node->papers_head, physics_paper);
-    }
-    
-    BST_Node* env_node = search_field(field_index, "Environmental Science");
-    if (env_node) {
-        Paper* env_paper = create_paper("Climate Change Modeling", "Environmental Science", 2021, 234);
-        insert_paper_end(&env_node->papers_head, env_paper);
-    }
-    
-    BST_Node* eng_node = search_field(field_index, "Engineering");
-    if (eng_node) {
-        Paper* eng_paper = create_paper("Renewable Energy Systems", "Engineering", 2020, 92);
-        insert_paper_end(&eng_node->papers_head, eng_paper);
-    }
-    
-    printf("Sample data initialized successfully!\n");
-}
-
 // Function untuk load data JSON saja (tanpa output)
 void load_json_data() {
     char filename[256];
@@ -619,9 +566,6 @@ int main() {
     
     printf("=== ENHANCED ACADEMIC PAPER SORTER ===\n");
     printf("Welcome! All features are now fully integrated.\n");
-    
-    // Initialize with sample data
-    initialize_sample_data();
     
     // Automatically load JSON data at startup (silent)
     load_json_data();
