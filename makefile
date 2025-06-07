@@ -11,6 +11,7 @@ TARGET = academic_paper_sorter
 SOURCES = Dzakir_BST.c \
           Fatim_DLLPapers.c \
           Ibnu_SLL.c \
+		  Ibnu_DLLPagination.c \
           Rizky_DLLjsonParser.c \
           Abi_MainProgramStack.c
 
@@ -34,6 +35,9 @@ Fatim_DLLPapers.o: Fatim_DLLPapers.c
 
 Ibnu_SLL.o: Ibnu_SLL.c
 	$(CC) $(CFLAGS) -c Ibnu_SLL.c -o Ibnu_SLL.o
+
+Ibnu_DLLPagination.o: Ibnu_DLLPagination.c
+	$(CC) $(CFLAGS) -c Ibnu_DLLPagination.c -o Ibnu_DLLPagination.o
 
 Rizky_DLLjsonParser.o: Rizky_DLLjsonParser.c
 	$(CC) $(CFLAGS) -c Rizky_DLLjsonParser.c -o Rizky_DLLjsonParser.o

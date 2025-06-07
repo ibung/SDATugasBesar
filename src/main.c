@@ -6,6 +6,7 @@
 #include "../include/Dzakir_BST.h"
 #include "../include/Fatim_DLLPapers.h"
 #include "../include/Ibnu_SLL.h"
+#include "../include/Ibnu_DLLPagination.h"
 #include "../include/Rizky_DLLjsonParser.h"
 #include "../include/Abi_MainProgramStack.h"
 
