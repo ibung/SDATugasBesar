@@ -375,15 +375,23 @@ void freeJSONPaper(JSONPaper* paper) {
     }
 }
 
-// ========== FUNGSI UNTUK DISPLAY ==========
 
-// Menampilkan AVL Tree secara In-Order
-void displayFieldsInOrder(AVLNode* root) {
+void displayFieldsInOrderAscending(AVLNode* root) {
     if (root != NULL) {
-        displayFieldsInOrder(root->left);
+        displayFieldsInOrderAscending(root->left);
         printf("📚 %-25s | Papers: %2d | Height: %d | Balance: %2d\n", 
                root->fieldOfStudy, root->paperCount, root->height, getBalance(root));
-        displayFieldsInOrder(root->right);
+        displayFieldsInOrderAscending(root->right);
+    }
+}
+
+// Menampilkan AVL Tree secara Reverse In-Order (Descending - Z to A)
+void displayFieldsInOrderDescending(AVLNode* root) {
+    if (root != NULL) {
+        displayFieldsInOrderDescending(root->right);
+        printf("📚 %-25s | Papers: %2d | Height: %d | Balance: %2d\n", 
+               root->fieldOfStudy, root->paperCount, root->height, getBalance(root));
+        displayFieldsInOrderDescending(root->left);
     }
 }
 
