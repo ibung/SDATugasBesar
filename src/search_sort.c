@@ -1,4 +1,4 @@
-#include "../include/Fatim_DLLPapers.h"
+#include "../include/search_sort.h"
 
 Paper* create_paper(const char* title, const char* field, int year, int citations) {
     Paper* paper = (Paper*)malloc(sizeof(Paper));
