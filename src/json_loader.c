@@ -1,7 +1,6 @@
 #include "../include/json_loader.h"
 #include "../include/cJSON.h"
 
-
 PaperLoader* initPaperLoader() {
     PaperLoader* loader = (PaperLoader*)malloc(sizeof(PaperLoader));
     loader->avlRoot = NULL;
@@ -9,7 +8,7 @@ PaperLoader* initPaperLoader() {
     loader->totalPapers = 0;
     loader->totalFields = 0;
     
-    printf("🚀 berhasil diinisialisasi!\n");
+    printf("🚀 Paper Loader berhasil diinisialisasi!\n");
     printf("📚 Citation Manager terintegrasi\n");
     printf("🌳 AVL Tree siap untuk organisasi berdasarkan bidang studi\n\n");
     return loader;
@@ -45,7 +44,6 @@ char* getJSONString(cJSON* json, const char* key, const char* defaultValue) {
     return (char*)defaultValue;
 }
 
-// Fungsi helper untuk mengambil integer dari cJSON object
 int getJSONInt(cJSON* json, const char* key, int defaultValue) {
     cJSON* item = cJSON_GetObjectItem(json, key);
     if (cJSON_IsNumber(item)) {
@@ -54,7 +52,7 @@ int getJSONInt(cJSON* json, const char* key, int defaultValue) {
     return defaultValue;
 }
 
-// Ekstrak nama author pertama dari array authors
+// FIXED: Ekstrak nama author pertama dari array authors
 void extractFirstAuthor(cJSON* authorsArray, char* result) {
     if (!cJSON_IsArray(authorsArray) || cJSON_GetArraySize(authorsArray) == 0) {
         strcpy(result, "Unknown Author");
@@ -71,7 +69,7 @@ void extractFirstAuthor(cJSON* authorsArray, char* result) {
     }
 }
 
-// Ekstrak fields of study dari array
+// FIXED: Ekstrak fields of study dari array
 int extractFieldsOfStudy(cJSON* fieldsArray, char fields[][150]) {
     if (!cJSON_IsArray(fieldsArray)) {
         strcpy(fields[0], "General");
@@ -86,6 +84,7 @@ int extractFieldsOfStudy(cJSON* fieldsArray, char fields[][150]) {
         if (cJSON_IsString(field) && field->valuestring != NULL) {
             strncpy(fields[count], field->valuestring, 149);
             fields[count][149] = '\0';
+            trimWhitespace(fields[count]); // Clean whitespace
             count++;
         }
     }
@@ -99,49 +98,47 @@ int extractFieldsOfStudy(cJSON* fieldsArray, char fields[][150]) {
     return count;
 }
 
-// Parse JSON line menjadi JSONPaper menggunakan cJSON
-JSONPaper* parseJSONPaper(const char* jsonLine) {
-    cJSON* json = cJSON_Parse(jsonLine);
-    if (json == NULL) {
-        printf("❌ Error parsing JSON: %s\n", cJSON_GetErrorPtr());
+// FIXED: Parse JSON object menjadi JSONPaper
+JSONPaper* parseJSONPaper(cJSON* jsonObject) {
+    if (jsonObject == NULL) {
         return NULL;
     }
     
     JSONPaper* paper = (JSONPaper*)malloc(sizeof(JSONPaper));
     if (paper == NULL) {
-        cJSON_Delete(json);
         return NULL;
     }
     
-    // Extract basic fields menggunakan helper functions
-    strncpy(paper->id, getJSONString(json, "id", "unknown"), 99);
+    // Extract basic fields
+    strncpy(paper->id, getJSONString(jsonObject, "id", "unknown"), 99);
     paper->id[99] = '\0';
     
-    strncpy(paper->title, getJSONString(json, "title", "Untitled Paper"), 299);
+    strncpy(paper->title, getJSONString(jsonObject, "title", "Untitled Paper"), 299);
     paper->title[299] = '\0';
     
     // Extract authors
-    cJSON* authorsArray = cJSON_GetObjectItem(json, "authors");
+    cJSON* authorsArray = cJSON_GetObjectItem(jsonObject, "authors");
     extractFirstAuthor(authorsArray, paper->authors);
     
     // Extract year
-    paper->year = getJSONInt(json, "year", 2000);
+    paper->year = getJSONInt(jsonObject, "year", 2000);
     
     // Extract fields of study
-    cJSON* fieldsArray = cJSON_GetObjectItem(json, "fieldsOfStudy");
+    cJSON* fieldsArray = cJSON_GetObjectItem(jsonObject, "fieldsOfStudy");
     paper->fieldCount = extractFieldsOfStudy(fieldsArray, paper->fieldsOfStudy);
     
-    // Extract citation count (coba beberapa nama field)
-    paper->citationCount = getJSONInt(json, "n_citation", 0);
-    if (paper->citationCount == 0) {
-        paper->citationCount = getJSONInt(json, "citationCount", 0);
+    // FIXED: Extract citation count from inCitations array
+    cJSON* inCitationsArray = cJSON_GetObjectItem(jsonObject, "inCitations");
+    if (cJSON_IsArray(inCitationsArray)) {
+        paper->citationCount = cJSON_GetArraySize(inCitationsArray);
+    } else {
+        paper->citationCount = 0;
     }
     
-    cJSON_Delete(json);
     return paper;
 }
 
-// Load data dari file JSON (versi yang disederhanakan)
+// FIXED: Load data dari file JSON Array format
 int loadJSONData(PaperLoader* loader, const char* filename) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
@@ -150,21 +147,59 @@ int loadJSONData(PaperLoader* loader, const char* filename) {
     }
     
     printf("📖 Memuat data dari file: %s\n", filename);
-    printf("⏳ Sedang parsing JSON dan membangun AVL Tree...\n\n");
+    printf("⏳ Sedang parsing JSON Array dan membangun AVL Tree...\n\n");
     
-    char line[4096];
+    // Read entire file into buffer
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    
+    char* json_buffer = (char*)malloc(file_size + 1);
+    if (json_buffer == NULL) {
+        printf("❌ Error: Tidak dapat mengalokasi memory untuk file\n");
+        fclose(file);
+        return 0;
+    }
+    
+    fread(json_buffer, 1, file_size, file);
+    json_buffer[file_size] = '\0';
+    fclose(file);
+    
+    // Parse JSON Array
+    cJSON* json_array = cJSON_Parse(json_buffer);
+    free(json_buffer);
+    
+    if (json_array == NULL) {
+        printf("❌ Error parsing JSON: %s\n", cJSON_GetErrorPtr());
+        return 0;
+    }
+    
+    if (!cJSON_IsArray(json_array)) {
+        printf("❌ Error: JSON file harus berupa array\n");
+        cJSON_Delete(json_array);
+        return 0;
+    }
+    
+    int array_size = cJSON_GetArraySize(json_array);
     int paperCount = 0;
     int processedEntries = 0;
     
-    while (fgets(line, sizeof(line), file)) {
-        // Skip empty lines
-        if (strlen(line) <= 1) continue;
+    printf("📊 Total papers dalam file: %d\n\n", array_size);
+    
+    // Process each paper in array
+    for (int i = 0; i < array_size; i++) {
+        cJSON* paper_object = cJSON_GetArrayItem(json_array, i);
         
-        // Parse JSON
-        JSONPaper* jsonPaper = parseJSONPaper(line);
+        if (!cJSON_IsObject(paper_object)) {
+            continue;
+        }
+        
+        // Parse JSON object
+        JSONPaper* jsonPaper = parseJSONPaper(paper_object);
         if (jsonPaper == NULL) continue;
         
-        printf("📄 Processing: %.50s%s\n", 
+        printf("📄 Processing [%d/%d]: %.50s%s\n", 
+               i + 1, array_size,
                jsonPaper->title,
                strlen(jsonPaper->title) > 50 ? "..." : "");
         
@@ -187,19 +222,19 @@ int loadJSONData(PaperLoader* loader, const char* filename) {
         paperCount++;
         
         // Progress indicator
-        if (paperCount % 10 == 0) {
+        if (paperCount % 50 == 0) {
             printf("   📊 Processed %d papers (%d entries)...\n", 
                    paperCount, processedEntries);
         }
         
-
-        if (paperCount >= 1000) {
+        // Limit untuk testing (hapus jika ingin load semua)
+        if (paperCount >= 100) {
             printf("⚠️  Limiting to first 100 papers for testing...\n");
             break;
         }
     }
     
-    fclose(file);
+    cJSON_Delete(json_array);
     
     loader->totalPapers = processedEntries;
     loader->totalFields = countAVLNodes(loader->avlRoot);

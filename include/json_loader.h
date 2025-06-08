@@ -1,38 +1,42 @@
 #ifndef JSON_LOADER_H
 #define JSON_LOADER_H
 
-#include "avl_paper_loader.h" // Menggunakan struktur AVLNode
-// ========== STRUKTUR DATA UNTUK PAPER LOADER ==========
-// Manager untuk Data Loader & AVL Builder (Anggota 1)
-typedef struct PaperLoader {
-    AVLNode* avlRoot;               // Root dari AVL Tree berdasarkan bidang studi
-    CitationManager* citationManager; // Manager citation yang sudah ada
-    int totalPapers;                // Total paper yang dimuat dari JSON
-    int totalFields;                // Total bidang studi unik
-} PaperLoader;
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include "avl_paper_loader.h"
+#include "citation_stack.h"
+#include "cJSON.h"
 
-// ========== STRUKTUR UNTUK JSON PARSING ==========
-// Struktur sementara untuk parsing JSON
+// Struktur untuk menyimpan data JSON yang diparsing
 typedef struct JSONPaper {
-    char id[100];                   // ID dari JSON
-    char title[300];                // Title dari JSON (increased size)
-    char authors[200];              // Authors (gabungan jika multiple)
-    char fieldsOfStudy[5][150];     // Array bidang studi (bisa multiple)
-    int fieldCount;                 // Jumlah bidang studi
-    int year;                       // Tahun publikasi
-    char inCitations[50][100];      // Array citation IDs
-    int citationCount;              // Jumlah citations
+    char id[100];
+    char title[300];
+    char authors[100];  // Nama author pertama saja
+    int year;
+    char fieldsOfStudy[5][150];  // Max 5 fields
+    int fieldCount;
+    int citationCount;  // Dari array inCitations
 } JSONPaper;
 
+// Struktur utama Paper Loader
+typedef struct PaperLoader {
+    AVLNode* avlRoot;
+    CitationManager* citationManager;
+    int totalPapers;
+    int totalFields;
+} PaperLoader;
 
-int loadJSONData(PaperLoader* loader, const char* filename);
-JSONPaper* parseJSONPaper(const char* jsonLine);
-Paper* convertJSONToPaper(JSONPaper* jsonPaper, const char* specificField);
+// Function declarations
 PaperLoader* initPaperLoader();
-void freePaperLoader(PaperLoader* loader);
-// char* extractJSONString(const char* json, const char* key);
-// int extractJSONInt(const char* json, const char* key);
-// int extractFieldsOfStudy(const char* json, char fields[][150]);
-// void extractAuthorsFromJSON(const char* json, char* result);
+int loadJSONData(PaperLoader* loader, const char* filename);
+JSONPaper* parseJSONPaper(cJSON* jsonObject);
+void extractFirstAuthor(cJSON* authorsArray, char* result);
+int extractFieldsOfStudy(cJSON* fieldsArray, char fields[][150]);
 void trimWhitespace(char* str);
-#endif // JSON_LOADER_H
+char* getJSONString(cJSON* json, const char* key, const char* defaultValue);
+int getJSONInt(cJSON* json, const char* key, int defaultValue);
+void freeJSONPaper(JSONPaper* paper);
+
+#endif
