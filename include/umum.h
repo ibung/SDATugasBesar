@@ -16,7 +16,6 @@ typedef struct Paper {
     char title[256];
     char field_of_study[100];
     int year;
-    char authors[200];  // Bisa berisi beberapa penulis, dipisahkan dengan koma
     int citation_count;
     Citation* citations_head;
     struct Paper* next;
