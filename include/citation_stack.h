@@ -38,6 +38,7 @@ typedef struct CitationManager {
 // Function declarations
 CitationManager* initCitationManager();
 void addCitation(CitationManager* manager, Paper* paper);
+void removeCitation(CitationManager* manager, int index);
 void displayCitations(CitationManager* manager);
 void pushHistory(CitationManager* manager, const char* action, const char* details);
 void popHistory(CitationManager* manager);

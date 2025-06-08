@@ -47,7 +47,54 @@ void addCitation(CitationManager* manager, Paper* paper) {
     printf("Citation added successfully!\n");
 }
 
-// Menampilkan semua citation
+// Menghapus citation berdasarkan index
+void removeCitation(CitationManager* manager, int index) {
+    if (manager->citationHead == NULL || index < 1 || index > manager->citationCount) {
+        printf("Invalid citation index.\n");
+        return;
+    }
+    
+    CitationNode* current = manager->citationHead;
+    CitationNode* prev = NULL;
+    
+    // Jika menghapus node pertama
+    if (index == 1) {
+        manager->citationHead = current->next;
+        
+        // Push ke history sebelum free
+        char details[200];
+        sprintf(details, "Removed citation: %s", current->paper->title);
+        pushHistory(manager, "REMOVE_CITATION", details);
+        
+        free(current->paper);
+        free(current);
+        manager->citationCount--;
+        printf("Citation removed successfully!\n");
+        return;
+    }
+    
+    // Cari node yang akan dihapus
+    for (int i = 1; i < index && current != NULL; i++) {
+        prev = current;
+        current = current->next;
+    }
+    
+    if (current != NULL) {
+        prev->next = current->next;
+        
+        // Push ke history sebelum free
+        char details[200];
+        sprintf(details, "Removed citation: %s", current->paper->title);
+        pushHistory(manager, "REMOVE_CITATION", details);
+        
+        free(current->paper);
+        free(current);
+        manager->citationCount--;
+        printf("Citation removed successfully!\n");
+    }
+}
+
+// Menampilkan semua citation dalam format akademik
 void displayCitations(CitationManager* manager) {
     if (manager->citationHead == NULL) {
         printf("No citations found.\n");
@@ -62,11 +109,9 @@ void displayCitations(CitationManager* manager) {
     
     while (current != NULL) {
         Paper* paper = current->paper;
-        printf("[%d] %s\n", index, paper->title);
-        printf("    Author: %s\n", paper->author);
-        printf("    Year: %d\n", paper->year);
-        printf("    Journal: %s\n", paper->journal);
-        printf("    Citations: %d\n", paper->citations);
+        // Format citation akademik: Author (Year). Title. Journal. Citations: X
+        printf("[%d] %s (%d). %s. %s. Citations: %d\n", 
+               index, paper->author, paper->year, paper->title, paper->journal, paper->citations);
         printf("    ------------------------\n");
         
         current = current->next;
