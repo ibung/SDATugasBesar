@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+=======
+#include "../include/search_sort.h"
+>>>>>>> main
 
 // Panggil semua header yang relevan secara eksplisit
 #include "../include/search_sort.h"
