@@ -7,6 +7,9 @@
 #include <string.h>
 #include <ctype.h>
 
+// Forward declaration untuk menghindari circular dependency
+typedef struct PaperLoader PaperLoader;
+
 // ========== STRUKTUR TAMBAHAN UNTUK AVL TREE ==========
 
 // Node AVL Tree berdasarkan bidang studi
@@ -19,7 +22,6 @@ typedef struct AVLNode {
     struct AVLNode* right;          // Pointer ke anak kanan
 } AVLNode;
 
-
 // === Fungsi untuk AVL Tree Operations ===
 AVLNode* createAVLNode(const char* fieldOfStudy);
 int getHeight(AVLNode* node);
@@ -29,8 +31,11 @@ AVLNode* rotateLeft(AVLNode* x);
 AVLNode* insertToAVL(AVLNode* root, Paper* paper);
 AVLNode* findFieldInAVL(AVLNode* root, const char* fieldOfStudy);
 void displayAVLTree(AVLNode* root, int level);
+void displayFieldsInOrderAscending(AVLNode* root);
+void displayFieldsInOrderDescending(AVLNode* root);
 void freeAVL(AVLNode* root);
 void displayPapersByField(PaperLoader* loader, const char* fieldOfStudy);
+void freePaperLoader(PaperLoader* loader);
 int countAVLNodes(AVLNode* root);
 
 #endif

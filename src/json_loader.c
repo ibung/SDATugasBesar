@@ -1,4 +1,5 @@
 #include "../include/json_loader.h"
+#include "../include/avl_paper_loader.h"
 #include "../include/cJSON.h"
 
 PaperLoader* initPaperLoader() {

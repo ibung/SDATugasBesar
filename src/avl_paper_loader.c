@@ -1,4 +1,4 @@
-#include "avl_paper_loader.h"
+#include "../include/avl_paper_loader.h"
 #include "../include/cJSON.h"
 #include <ctype.h>
 #include "../include/json_loader.h"
@@ -66,7 +66,7 @@ AVLNode* createAVLNode(const char* fieldOfStudy) {
 AVLNode* insertToAVL(AVLNode* root, Paper* paper) {
     // 1. Lakukan BST insertion biasa
     if (root == NULL) {
-        AVLNode* newNode = createAVLNode(paper->bidang_studi);
+        AVLNode* newNode = createAVLNode(paper->field_of_study);
         
         // Buat CitationNode untuk paper ini
         CitationNode* citationNode = (CitationNode*)malloc(sizeof(CitationNode));
@@ -76,11 +76,11 @@ AVLNode* insertToAVL(AVLNode* root, Paper* paper) {
         newNode->paperList = citationNode;
         newNode->paperCount = 1;
         
-        printf("   Bidang studi baru '%s' ditambahkan ke AVL Tree\n", paper->bidang_studi);
+        printf("   Bidang studi baru '%s' ditambahkan ke AVL Tree\n", paper->field_of_study);
         return newNode;
     }
     
-    int cmp = strcmp(paper->bidang_studi, root->fieldOfStudy);
+    int cmp = strcmp(paper->field_of_study, root->fieldOfStudy);
     
     if (cmp < 0) {
         root->left = insertToAVL(root->left, paper);
@@ -97,7 +97,7 @@ AVLNode* insertToAVL(AVLNode* root, Paper* paper) {
         root->paperCount++;
         
         printf("   Paper '%s' ditambahkan ke bidang '%s' (total: %d)\n", 
-               paper->title, paper->bidang_studi, root->paperCount);
+               paper->title, paper->field_of_study, root->paperCount);
         return root;
     }
     
@@ -111,26 +111,26 @@ AVLNode* insertToAVL(AVLNode* root, Paper* paper) {
     // 4. Jika tidak seimbang, lakukan rotasi
     
     // Left Left Case
-    if (balance > 1 && strcmp(paper->bidang_studi, root->left->fieldOfStudy) < 0) {
+    if (balance > 1 && strcmp(paper->field_of_study, root->left->fieldOfStudy) < 0) {
         printf("  Melakukan rotasi kanan (LL Case)\n");
         return rotateRight(root);
     }
     
     // Right Right Case
-    if (balance < -1 && strcmp(paper->bidang_studi, root->right->fieldOfStudy) > 0) {
+    if (balance < -1 && strcmp(paper->field_of_study, root->right->fieldOfStudy) > 0) {
         printf("  Melakukan rotasi kiri (RR Case)\n");
         return rotateLeft(root);
     }
     
     // Left Right Case
-    if (balance > 1 && strcmp(paper->bidang_studi, root->left->fieldOfStudy) > 0) {
+    if (balance > 1 && strcmp(paper->field_of_study, root->left->fieldOfStudy) > 0) {
         printf("  Melakukan rotasi kiri-kanan (LR Case)\n");
         root->left = rotateLeft(root->left);
         return rotateRight(root);
     }
     
     // Right Left Case
-    if (balance < -1 && strcmp(paper->bidang_studi, root->right->fieldOfStudy) < 0) {
+    if (balance < -1 && strcmp(paper->field_of_study, root->right->fieldOfStudy) < 0) {
         printf("  Melakukan rotasi kanan-kiri (RL Case)\n");
         root->right = rotateRight(root->right);
         return rotateLeft(root);
@@ -196,22 +196,22 @@ void displayPapersByField(PaperLoader* loader, const char* fieldOfStudy) {
         return;
     }
     
-    printf("\n🔍 PAPERS IN FIELD: %s\n", fieldOfStudy);
+    printf("\nPAPERS IN FIELD: %s\n", fieldOfStudy);
     printf("══════════════════════════════════════════════════════════════\n");
-    printf("📊 Total papers: %d\n\n", fieldNode->paperCount);
+    printf("Total papers: %d\n\n", fieldNode->paperCount);
     
     CitationNode* current = fieldNode->paperList;
     int index = 1;
     
     while (current != NULL) {
         Paper* paper = current->paper;
-        printf("📄 Paper #%d:\n", index);
-        printf("   📋 Judul: %.60s%s\n", paper->title, 
+        printf("Paper #%d:\n", index);
+        printf("   udul: %.60s%s\n", paper->title, 
                strlen(paper->title) > 60 ? "..." : "");
-        printf("   👤 Author: %s\n", paper->author);
-        printf("   📅 Tahun: %d\n", paper->year);
-        printf("   📊 Citations: %d\n", paper->citations);
-        printf("   🏷️  Bidang: %s\n", paper->bidang_studi);
+        printf("  Author: %s\n", paper->authors);
+        printf("  Tahun: %d\n", paper->year);
+        printf("  Citations: %d\n", paper->citations);
+        printf("  Bidang: %s\n", paper->field_of_study);
         printf("   ────────────────────────────────────────\n");
         
         current = current->next;

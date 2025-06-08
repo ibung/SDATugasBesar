@@ -5,9 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "avl_paper_loader.h"
 #include "citation_stack.h"
 #include "cJSON.h"
+
+// Forward declaration
+typedef struct AVLNode AVLNode;
 
 // Struktur untuk menyimpan data JSON yang diparsing
 typedef struct JSONPaper {

@@ -4,16 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-// Struktur untuk menyimpan informasi paper
-typedef struct Paper {
-    char title[200];
-    char author[100];
-    int year;
-    char bidang_studi[150];
-    int citations;
-    struct Paper* next;
-} Paper;
+#include "umum.h"
 
 // Struktur untuk Citation (SLL)
 typedef struct CitationNode {
