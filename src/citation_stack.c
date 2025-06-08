@@ -10,12 +10,12 @@ CitationManager* initCitationManager() {
 }
 
 // Membuat paper baru
-Paper* createPaper(const char* title, const char* author, int year, const char* journal, int citations) {
+Paper* createPaper(const char* title, const char* author, int year, const char* bidang_studi, int citations) {
     Paper* newPaper = (Paper*)malloc(sizeof(Paper));
     strcpy(newPaper->title, title);
     strcpy(newPaper->author, author);
     newPaper->year = year;
-    strcpy(newPaper->journal, journal);
+    strcpy(newPaper->bidang_studi, bidang_studi);
     newPaper->citations = citations;
     newPaper->next = NULL;
     return newPaper;
@@ -109,9 +109,9 @@ void displayCitations(CitationManager* manager) {
     
     while (current != NULL) {
         Paper* paper = current->paper;
-        // Format citation akademik: Author (Year). Title. Journal. Citations: X
-        printf("[%d] %s (%d). %s. %s. Citations: %d\n", 
-               index, paper->author, paper->year, paper->title, paper->journal, paper->citations);
+        // Format citation akademik dengan bidang studi
+        printf("[%d] %s (%d). %s. Bidang Studi: %s. Citations: %d\n", 
+               index, paper->author, paper->year, paper->title, paper->bidang_studi, paper->citations);
         printf("    ------------------------\n");
         
         current = current->next;

@@ -10,7 +10,7 @@ typedef struct Paper {
     char title[200];
     char author[100];
     int year;
-    char journal[150];
+    char bidang_studi[150];
     int citations;
     struct Paper* next;
 } Paper;
@@ -43,7 +43,7 @@ void displayCitations(CitationManager* manager);
 void pushHistory(CitationManager* manager, const char* action, const char* details);
 void popHistory(CitationManager* manager);
 void displayHistory(CitationManager* manager);
-Paper* createPaper(const char* title, const char* author, int year, const char* journal, int citations);
+Paper* createPaper(const char* title, const char* author, int year, const char* bidang_studi, int citations);
 void freeCitationManager(CitationManager* manager);
 
 #endif
