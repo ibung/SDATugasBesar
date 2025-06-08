@@ -1,4 +1,4 @@
-#include "../include/Ibnu_DLLPagination.h"
+#include "../include/pagination.h"
 
 // NEW PAGINATION FUNCTIONS
 
