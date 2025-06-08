@@ -1,120 +1,144 @@
-#include "../include/Ibnu_SLL.h"
+#include "citation_stack.h"
 
-// Existing citation functions (unchanged)
-Citation* create_citation(const char* paper_id, const char* title, int citation_count) {
-    Citation* citation = (Citation*)malloc(sizeof(Citation));        
-    strcpy(citation->citing_paper_id, paper_id);
-    strcpy(citation->citing_paper_title, title);
-    citation->citation_count = citation_count;
-    citation->next = NULL;
-    return citation;
+// Inisialisasi Citation Manager
+CitationManager* initCitationManager() {
+    CitationManager* manager = (CitationManager*)malloc(sizeof(CitationManager));
+    manager->citationHead = NULL;
+    manager->historyTop = NULL;
+    manager->citationCount = 0;
+    return manager;
 }
 
-void add_citation(Citation** head, Citation* new_citation) {
-    if (*head == NULL) {
-        *head = new_citation;
-        return;
-    }
-    
-    Citation* current = *head;
-    while (current->next != NULL) {
-        current = current->next;
-    }
-    current->next = new_citation;
+// Membuat paper baru
+Paper* createPaper(const char* title, const char* author, int year, const char* journal, int citations) {
+    Paper* newPaper = (Paper*)malloc(sizeof(Paper));
+    strcpy(newPaper->title, title);
+    strcpy(newPaper->author, author);
+    newPaper->year = year;
+    strcpy(newPaper->journal, journal);
+    newPaper->citations = citations;
+    newPaper->next = NULL;
+    return newPaper;
 }
 
-int count_citations(Citation* head) {
-    int count = 0;
-    Citation* current = head;
-    while (current != NULL) {
-        count++;
-        current = current->next;
+// Menambahkan citation ke SLL
+void addCitation(CitationManager* manager, Paper* paper) {
+    CitationNode* newNode = (CitationNode*)malloc(sizeof(CitationNode));
+    newNode->paper = paper;
+    newNode->next = NULL;
+    
+    if (manager->citationHead == NULL) {
+        manager->citationHead = newNode;
+    } else {
+        CitationNode* temp = manager->citationHead;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;
     }
-    return count;
+    
+    manager->citationCount++;
+    
+    // Push ke history
+    char details[200];
+    sprintf(details, "Added citation: %s", paper->title);
+    pushHistory(manager, "ADD_CITATION", details);
+    
+    printf("Citation added successfully!\n");
 }
 
-Citation* merge_sort_citations(Citation* head) {
-    if (head == NULL || head->next == NULL) {
-        return head;
-    }
-    
-    Citation* middle = get_middle(head);
-    Citation* next_of_middle = middle->next;
-    middle->next = NULL;
-    
-    Citation* left = merge_sort_citations(head);
-    Citation* right = merge_sort_citations(next_of_middle);
-    
-    return merge_citations(left, right);
-}
-
-void display_citations(Citation* head) {
-    if (head == NULL) {
+// Menampilkan semua citation
+void displayCitations(CitationManager* manager) {
+    if (manager->citationHead == NULL) {
         printf("No citations found.\n");
         return;
     }
-
-    printf("\n========== CITATIONS LIST ==========\n");
-    Citation* current = head;
-    int count = 1;
-
+    
+    printf("\n=== CITATION LIST ===\n");
+    printf("Total Citations: %d\n\n", manager->citationCount);
+    
+    CitationNode* current = manager->citationHead;
+    int index = 1;
+    
     while (current != NULL) {
-        printf("%d. Paper ID: %s\n", count, current->citing_paper_id);
-        printf("   Title: %s\n", current->citing_paper_title);
-        printf("   Citations: %d\n", current->citation_count);
-        printf("   ----------------------------------\n");
-
+        Paper* paper = current->paper;
+        printf("[%d] %s\n", index, paper->title);
+        printf("    Author: %s\n", paper->author);
+        printf("    Year: %d\n", paper->year);
+        printf("    Journal: %s\n", paper->journal);
+        printf("    Citations: %d\n", paper->citations);
+        printf("    ------------------------\n");
+        
         current = current->next;
-        count++;
+        index++;
     }
-    printf("Total citations: %d\n\n", count - 1);
+    
+    // Push ke history
+    pushHistory(manager, "VIEW_CITATIONS", "Displayed all citations");
 }
 
-void free_citations(Citation* head) {
-    Citation* current = head;
-    Citation* next_citation;
+// Push action ke history stack
+void pushHistory(CitationManager* manager, const char* action, const char* details) {
+    HistoryNode* newNode = (HistoryNode*)malloc(sizeof(HistoryNode));
+    strcpy(newNode->action, action);
+    strcpy(newNode->details, details);
+    newNode->next = manager->historyTop;
+    manager->historyTop = newNode;
+}
+
+// Pop (undo) dari history stack
+void popHistory(CitationManager* manager) {
+    if (manager->historyTop == NULL) {
+        printf("No history to undo.\n");
+        return;
+    }
+    
+    HistoryNode* temp = manager->historyTop;
+    printf("Undoing: %s - %s\n", temp->action, temp->details);
+    
+    manager->historyTop = manager->historyTop->next;
+    free(temp);
+    
+    printf("Last action undone.\n");
+}
+
+// Menampilkan history stack
+void displayHistory(CitationManager* manager) {
+    if (manager->historyTop == NULL) {
+        printf("No history available.\n");
+        return;
+    }
+    
+    printf("\n=== SEARCH HISTORY ===\n");
+    HistoryNode* current = manager->historyTop;
+    int index = 1;
     
     while (current != NULL) {
-        next_citation = current->next;
-        free(current);
-        current = next_citation;
+        printf("[%d] %s: %s\n", index, current->action, current->details);
+        current = current->next;
+        index++;
     }
+    printf("======================\n");
 }
 
-Citation* get_middle(Citation* head) {
-    if (head == NULL) {
-        return head;
+// Free memory
+void freeCitationManager(CitationManager* manager) {
+    // Free citations
+    CitationNode* citeCurrent = manager->citationHead;
+    while (citeCurrent != NULL) {
+        CitationNode* temp = citeCurrent;
+        citeCurrent = citeCurrent->next;
+        free(temp->paper);
+        free(temp);
     }
     
-    Citation* slow = head;
-    Citation* fast = head->next;
-    
-    while (fast != NULL && fast->next != NULL) {
-        slow = slow->next;
-        fast = fast->next->next;
+    // Free history
+    HistoryNode* histCurrent = manager->historyTop;
+    while (histCurrent != NULL) {
+        HistoryNode* temp = histCurrent;
+        histCurrent = histCurrent->next;
+        free(temp);
     }
     
-    return slow;
+    free(manager);
 }
-
-Citation* merge_citations(Citation* left, Citation* right) {
-    Citation* result = NULL;
-
-    if (left == NULL) {
-        return right;
-    }
-    if (right == NULL) {
-        return left;
-    }
-
-    if (left->citation_count >= right->citation_count) {
-        result = left;
-        result->next = merge_citations(left->next, right);
-    } else {
-        result = right;
-        result->next = merge_citations(left, right->next);
-    }
-
-    return result;
-}
-

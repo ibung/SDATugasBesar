@@ -1,16 +1,48 @@
-#ifndef IBNU_SLL_H
-#define IBNU_SLL_H
+#ifndef CITATION_STACK_H
+#define CITATION_STACK_H
 
-#include "umum.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Struktur untuk menyimpan informasi paper
+typedef struct Paper {
+    char title[200];
+    char author[100];
+    int year;
+    char journal[150];
+    int citations;
+    struct Paper* next;
+} Paper;
+
+// Struktur untuk Citation (SLL)
+typedef struct CitationNode {
+    Paper* paper;
+    struct CitationNode* next;
+} CitationNode;
+
+// Struktur untuk History Stack
+typedef struct HistoryNode {
+    char action[100];
+    char details[200];
+    struct HistoryNode* next;
+} HistoryNode;
+
+// Struktur utama untuk Citation Manager
+typedef struct CitationManager {
+    CitationNode* citationHead;
+    HistoryNode* historyTop;
+    int citationCount;
+} CitationManager;
 
 // Function declarations
-Citation* create_citation(const char* paper_id, const char* title, int citation_count);
-void add_citation(Citation** head, Citation* new_citation);
-int count_citations(Citation* head);
-Citation* merge_sort_citations(Citation* head);
-void display_citations(Citation* head);
-void free_citations(Citation* head);
-Citation* get_middle(Citation* head);
-Citation* merge_citations(Citation* left, Citation* right);
+CitationManager* initCitationManager();
+void addCitation(CitationManager* manager, Paper* paper);
+void displayCitations(CitationManager* manager);
+void pushHistory(CitationManager* manager, const char* action, const char* details);
+void popHistory(CitationManager* manager);
+void displayHistory(CitationManager* manager);
+Paper* createPaper(const char* title, const char* author, int year, const char* journal, int citations);
+void freeCitationManager(CitationManager* manager);
 
 #endif
