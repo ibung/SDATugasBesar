@@ -1,18 +1,54 @@
-#ifndef FATIM_DLLPAPERS_H
-#define FATIM_DLLPAPERS_H
+#ifndef SEARCH_SORT_H
+#define SEARCH_SORT_H
 
-#include "umum.h"
+#include "avl_paper_loader.h" 
+#include "pagination.h"      
+#include "citation_stack.h"  
 
-// Function declarations
-Paper* create_paper(const char* title, const char* field, int year, int citations);
-void insert_paper_sorted_by_year(Paper** head, Paper* new_paper);
-void insert_paper_end(Paper** head, Paper* new_paper);
-void sort_by_citations(Paper** head);
-void sort_papers_by_year(Paper** head, int newest_first);
-void sort_papers_by_citations(Paper** head, int most_popular_first);
-void swap_paper_data(Paper* a, Paper* b);
-void display_papers(Paper* head);
-void display_papers_compact(Paper* head);
-void free_papers_list(Paper* head);
+// Enum untuk kriteria sorting, membuatnya lebih mudah dibaca dan dikelola.
+typedef enum {
+    SORT_BY_YEAR,
+    SORT_BY_CITATIONS
+} SortCriteria;
 
-#endif
+// Enum untuk urutan sorting.
+typedef enum {
+    SORT_ASC, // Menaik
+    SORT_DESC // Menurun
+} SortOrder;
+
+
+typedef struct SearchResult {
+    Paper** papers;               // Array dinamis dari pointer ke Paper
+    int count;                   // Jumlah total hasil pencarian
+    char searchTerm[150];        // Term pencarian yang digunakan
+    char sortCriteria[20];       // Kriteria pengurutan (year atau citations)
+    char sortOrder[10];          // Urutan pengurutan (asc atau desc)
+} SearchResult;
+
+typedef struct Paper {
+    char title[200];
+    char author[100];         // <-- Nama field: author
+    int year;
+    char bidang_studi[150];   // <-- Nama field: bidang_studi
+    int citations;           // <-- Nama field: citations
+    struct Paper* next;
+} Paper;
+
+
+// ========== DEKLARASI FUNGSI UTAMA ==========
+
+
+SearchResult* performSearchAndSort(PaperLoader* loader, const char* fieldOfStudy, SortCriteria criteria, SortOrder order);
+
+PaginationSystem* sendToPagination(SearchResult* result);
+
+
+// ========== DEKLARASI FUNGSI BANTU DAN DEMO ========//
+void displaySearchResult(const SearchResult* result);
+
+void freeSearchResult(SearchResult* result);
+
+void demonstrateSearchAndSort(PaperLoader* loader);
+
+#endif // SEARCH_SORT_H

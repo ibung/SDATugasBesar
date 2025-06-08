@@ -1,252 +1,204 @@
-#include "../include/Fatim_DLLPapers.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../include/search_sort.h"
+#include "../include/avl_paper_loader.h"
+#include "../include/pagination.h"
+#include "../include/citation_stack.h"
 
-Paper* create_paper(const char* title, const char* field, int year, int citations) {
-    Paper* paper = (Paper*)malloc(sizeof(Paper));
-    strcpy(paper->title, title);
-    strcpy(paper->field_of_study, field);
-    paper->year = year;
-    paper->citation_count = citations;
-    paper->citations_head = NULL;
-    paper->next = NULL;
-    paper->prev = NULL;
-    return paper;
+// ========== FUNGSI INTERNAL (STATIC) ==========
+
+static SearchResult* createSearchResult() {
+    SearchResult* result = (SearchResult*)malloc(sizeof(SearchResult));
+    if (!result) return NULL;
+
+    result->papers = NULL;
+    result->count = 0;
+    strcpy(result->searchTerm, "");
+    strcpy(result->sortCriteria, "none");
+    strcpy(result->sortOrder, "none");
+    
+    return result;
 }
 
-// Helper function untuk swap data antara dua paper nodes
-void swap_paper_data(Paper* a, Paper* b) {
-    // Swap title
-    char temp_title[256];
-    strcpy(temp_title, a->title);
-    strcpy(a->title, b->title);
-    strcpy(b->title, temp_title);
-    
-    // Swap field
-    char temp_field[100];
-    strcpy(temp_field, a->field_of_study);
-    strcpy(a->field_of_study, b->field_of_study);
-    strcpy(b->field_of_study, temp_field);
-    
-    // Swap year
-    int temp_year = a->year;
-    a->year = b->year;
-    b->year = temp_year;
-    
-    // Swap citation count
-    int temp_citations = a->citation_count;
-    a->citation_count = b->citation_count;
-    b->citation_count = temp_citations;
-    
-    // Note: We don't swap citations_head pointer as it should stay with original paper
+/**
+ * @brief Menambahkan satu paper ke dalam array dinamis di SearchResult.
+ */
+static void addPaperToResult(SearchResult* result, Paper* paper) {
+    if (!result || !paper) return;
+
+    // Menambah ukuran array 'papers' untuk menampung pointer baru
+    result->count++;
+    result->papers = (Paper**)realloc(result->papers, result->count * sizeof(Paper*));
+    if (!result->papers) {
+        perror("Gagal realloc memori untuk hasil pencarian");
+        exit(EXIT_FAILURE);
+    }
+    result->papers[result->count - 1] = paper;
 }
 
-void insert_paper_sorted_by_year(Paper** head, Paper* new_paper) {
-    if (*head == NULL) {
-        *head = new_paper;
-        return;
-    }
-    
-    if (new_paper->year < (*head)->year) {
-        new_paper->next = *head;
-        (*head)->prev = new_paper;
-        *head = new_paper;
-        return;
-    }
-    
-    Paper* current = *head;
-    while (current->next != NULL && current->next->year < new_paper->year) {
-        current = current->next;
-    }
-    
-    new_paper->next = current->next;
-    if (current->next != NULL) {
-        current->next->prev = new_paper;
-    }
-    current->next = new_paper;
-    new_paper->prev = current;
+// ========== FUNGSI PERBANDINGAN UNTUK QSORT ==========
+
+// Fungsi pembanding untuk mengurutkan berdasarkan tahun.
+static int compareByYear(const void* a, const void* b) {
+    Paper* paperA = *(Paper**)a;
+    Paper* paperB = *(Paper**)b;
+    return (paperA->year - paperB->year);
 }
 
-void sort_by_citations(Paper** head) {
-    if (*head == NULL || (*head)->next == NULL) return;
-    
-    // Bubble sort for simplicity (can be optimized)
-    int swapped;
-    Paper* ptr1;
-    Paper* lptr = NULL;
-    
-    do {
-        swapped = 0;
-        ptr1 = *head;
-        
-        while (ptr1->next != lptr) {
-            if (ptr1->citation_count < ptr1->next->citation_count) {
-                swap_paper_data(ptr1, ptr1->next);
-                swapped = 1;
-            }
-            ptr1 = ptr1->next;
-        }
-        lptr = ptr1;
-    } while (swapped);
+// Fungsi pembanding untuk mengurutkan berdasarkan jumlah sitasi.
+static int compareByCitations(const void* a, const void* b) {
+    Paper* paperA = *(Paper**)a;
+    Paper* paperB = *(Paper**)b;
+    return (paperA->citations - paperB->citations);
 }
 
-// Fungsi baru untuk sorting berdasarkan tahun (newest/oldest first)
-void sort_papers_by_year(Paper** head, int newest_first) {
-    if (*head == NULL || (*head)->next == NULL) return;
-    
-    int swapped;
-    Paper* ptr1;
-    Paper* lptr = NULL;
-    
-    do {
-        swapped = 0;
-        ptr1 = *head;
-        
-        while (ptr1->next != lptr) {
-            int should_swap = 0;
-            
-            if (newest_first) {
-                // Newest first: swap if current year < next year
-                should_swap = (ptr1->year < ptr1->next->year);
-            } else {
-                // Oldest first: swap if current year > next year
-                should_swap = (ptr1->year > ptr1->next->year);
-            }
-            
-            if (should_swap) {
-                swap_paper_data(ptr1, ptr1->next);
-                swapped = 1;
-            }
-            ptr1 = ptr1->next;
-        }
-        lptr = ptr1;
-    } while (swapped);
-}
+// ========== IMPLEMENTASI FUNGSI UTAMA ==========
 
-// Fungsi baru untuk sorting berdasarkan sitasi (most/least popular)
-void sort_papers_by_citations(Paper** head, int most_popular_first) {
-    if (*head == NULL || (*head)->next == NULL) return;
-    
-    int swapped;
-    Paper* ptr1;
-    Paper* lptr = NULL;
-    
-    do {
-        swapped = 0;
-        ptr1 = *head;
-        
-        while (ptr1->next != lptr) {
-            int should_swap = 0;
-            
-            if (most_popular_first) {
-                // Most popular first: swap if current citations < next citations
-                should_swap = (ptr1->citation_count < ptr1->next->citation_count);
-            } else {
-                // Least popular first: swap if current citations > next citations
-                should_swap = (ptr1->citation_count > ptr1->next->citation_count);
-            }
-            
-            if (should_swap) {
-                swap_paper_data(ptr1, ptr1->next);
-                swapped = 1;
-            }
-            ptr1 = ptr1->next;
-        }
-        lptr = ptr1;
-    } while (swapped);
-}
+SearchResult* performSearchAndSort(PaperLoader* loader, const char* fieldOfStudy, SortCriteria criteria, SortOrder order) {
+    printf("\n🔍 Mencari bidang studi: '%s'...\n", fieldOfStudy);
 
-void insert_paper_end(Paper** head, Paper* new_paper) {
-    if (*head == NULL) {
-        *head = new_paper;
-        return;
+    AVLNode* fieldNode = findFieldInAVL(loader->avlRoot, fieldOfStudy);
+
+    if (fieldNode == NULL) {
+        printf("❌ Bidang studi '%s' tidak ditemukan dalam data.\n", fieldOfStudy);
+        return NULL;
     }
-    
-    Paper* current = *head;
-    // Traverse ke akhir list
-    while (current->next != NULL) {
-        current = current->next;
-    }
-    
-    // Insert di akhir
-    current->next = new_paper;
-    new_paper->prev = current;
-    new_paper->next = NULL;
-}
 
-// Fungsi untuk menampilkan semua papers dalam list
-void display_papers(Paper* head) {
-    if (head == NULL) {
-        printf("No papers found.\n");
-        return;
-    }
+    printf("✅ Bidang studi ditemukan. Terdapat %d paper.\n", fieldNode->paperCount);
+
+    SearchResult* result = createSearchResult();
+    strncpy(result->searchTerm, fieldOfStudy, sizeof(result->searchTerm) - 1);
     
-    printf("\n========== PAPERS LIST ==========\n");
-    Paper* current = head;
-    int count = 1;
-    
+    // Menyalin pointer dari SLL (paperList) ke array dinamis di SearchResult
+    CitationNode* current = fieldNode->paperList;
     while (current != NULL) {
-        printf("%d. Title: %s\n", count, current->title);
-        printf("   Field: %s\n", current->field_of_study);
-        printf("   Year: %d\n", current->year);
-        printf("   Citations: %d\n", current->citation_count);
-        printf("   --------------------------------\n");
-        
+        addPaperToResult(result, current->paper);
         current = current->next;
-        count++;
     }
-    printf("Total papers: %d\n", count - 1);
-    printf("=================================\n\n");
+
+    printf("📊 Mengurutkan %d hasil...\n", result->count);
+    
+    // Memilih fungsi pembanding berdasarkan kriteria
+    int (*comparator)(const void*, const void*) = NULL;
+    if (criteria == SORT_BY_YEAR) {
+        comparator = compareByYear;
+        strcpy(result->sortCriteria, "year");
+    } else { // SORT_BY_CITATIONS
+        comparator = compareByCitations;
+        strcpy(result->sortCriteria, "citations");
+    }
+
+    // Menggunakan qsort untuk pengurutan yang efisien
+    qsort(result->papers, result->count, sizeof(Paper*), comparator);
+
+    // qsort selalu ascending, jadi kita balik arraynya jika urutan descending diperlukan
+    if (order == SORT_DESC) {
+        strcpy(result->sortOrder, "desc");
+        int i = 0;
+        int j = result->count - 1;
+        while (i < j) {
+            Paper* temp = result->papers[i];
+            result->papers[i] = result->papers[j];
+            result->papers[j] = temp;
+            i++;
+            j--;
+        }
+    } else {
+        strcpy(result->sortOrder, "asc");
+    }
+    
+    printf("✅ Pengurutan selesai. Kriteria: '%s', Urutan: '%s'.\n", result->sortCriteria, result->sortOrder);
+    return result;
 }
 
-// Fungsi untuk menampilkan papers dengan format yang lebih compact
-void display_papers_compact(Paper* head) {
-    if (head == NULL) {
-        printf("No papers found.\n");
+PaginationSystem* sendToPagination(SearchResult* result) {
+    if (result == NULL || result->count == 0) {
+        printf("📤 Tidak ada hasil untuk dikirim ke sistem paginasi.\n");
+        return NULL;
+    }
+
+    printf("📤 Mengirim %d hasil ke modul paginasi...\n", result->count);
+    
+    PaginationSystem* pagination = create_pagination_system();
+    for (int i = 0; i < result->count; i++) {
+        add_paper_to_pagination(pagination, result->papers[i]);
+    }
+    
+    printf("✅ Sistem paginasi berhasil dibuat dengan total %d tab.\n", pagination->total_tabs);
+    return pagination;
+}
+
+
+// ========== IMPLEMENTASI FUNGSI BANTU DAN DEMO ==========
+
+void displaySearchResult(const SearchResult* result) {
+    if (result == NULL || result->count == 0) {
+        printf("\n--- Tidak ada hasil untuk ditampilkan ---\n");
         return;
     }
-    
-    printf("\n%-50s %-20s %-6s %-10s\n", "Title", "Field", "Year", "Citations");
-    printf("================================================================================\n");
-    
-    Paper* current = head;
-    int count = 1;
-    
-    while (current != NULL) {
-        // Truncate title if too long
-        char display_title[51];
-        if (strlen(current->title) > 50) {
-            strncpy(display_title, current->title, 47);
-            strcat(display_title, "...");
-        } else {
-            strcpy(display_title, current->title);
-        }
-        
-        printf("%-50s %-20s %-6d %-10d\n", 
-               display_title, 
-               current->field_of_study, 
-               current->year, 
-               current->citation_count);
-        
-        current = current->next;
-        count++;
+
+    printf("\n======================================================\n");
+    printf("            HASIL PENCARIAN & SORTING\n");
+    printf("======================================================\n");
+    printf("Kueri         : %s\n", result->searchTerm);
+    printf("Jumlah Hasil  : %d\n", result->count);
+    printf("Diurutkan oleh: %s (%s)\n", result->sortCriteria, result->sortOrder);
+    printf("------------------------------------------------------\n\n");
+
+    int display_limit = (result->count > 5) ? 5 : result->count; // Tampilkan 5 pertama saja
+    printf("Menampilkan %d dari %d hasil teratas:\n\n", display_limit, result->count);
+
+    for (int i = 0; i < display_limit; i++) {
+        Paper* p = result->papers[i];
+        printf("[%d] %s\n", i + 1, p->title);
+        printf("    Author    : %s\n", p->author);
+        printf("    Tahun     : %d\n", p->year);
+        printf("    Sitasi    : %d\n", p->citations);
+        printf("    Bidang    : %s\n\n", p->bidang_studi);
     }
-    printf("================================================================================\n");
-    printf("Total papers: %d\n\n", count - 1);
+
+    if (result->count > display_limit) {
+        printf("... dan %d hasil lainnya akan ditampilkan melalui paginasi.\n", result->count - display_limit);
+    }
+    printf("======================================================\n");
 }
 
-// Fungsi untuk membebaskan semua memori dalam linked list papers
-void free_papers_list(Paper* head) {
-    Paper* current = head;
-    Paper* next_paper;
-    
-    while (current != NULL) {
-        next_paper = current->next;
-        
-        // TODO: Free citations linked list jika ada
-        // Ini tergantung implementasi struct Citation
-        // Contoh: free_citations_list(current->citations_head);
-        
-        // Free current paper
-        free(current);
-        current = next_paper;
+void freeSearchResult(SearchResult* result) {
+    if (result != NULL) {
+        free(result->papers); // Membebaskan array dari pointer
+        free(result);         // Membebaskan struct itu sendiri
+        printf("🧹 Memori untuk SearchResult telah dibebaskan.\n");
     }
+}
+
+void demonstrateSearchAndSort(PaperLoader* loader) {
+    printf("\n\n=============== DEMO SEARCHING & SORTING ENGINE ===============\n");
+
+    // Skenario 1: Mencari 'Computer Science', urutkan berdasarkan sitasi terbanyak
+    printf("\n--- SKENARIO 1: Mencari 'Computer Science', urutkan berdasarkan sitasi (DESC) ---\n");
+    SearchResult* result1 = performSearchAndSort(loader, "Computer Science", SORT_BY_CITATIONS, SORT_DESC);
+    
+    if (result1) {
+        displaySearchResult(result1);
+        
+        PaginationSystem* pagination1 = sendToPagination(result1);
+        if (pagination1) {
+            printf("\nTekan Enter untuk menampilkan paginasi interaktif...");
+            getchar(); // Menunggu input pengguna
+            navigate_pagination(pagination1); // Fungsi dari modul paginasi
+            free_pagination_system(pagination1); // Membersihkan memori paginasi
+        }
+        freeSearchResult(result1); // Membersihkan memori hasil pencarian
+    }
+
+    // Skenario 2: Mencari 'Mathematics', urutkan berdasarkan tahun terlama
+    printf("\n\n--- SKENARIO 2: Mencari 'Mathematics', urutkan berdasarkan tahun (ASC) ---\n");
+    SearchResult* result2 = performSearchAndSort(loader, "Mathematics", SORT_BY_YEAR, SORT_ASC);
+    if (result2) {
+        displaySearchResult(result2);
+        freeSearchResult(result2);
+    }
+
+    printf("\n=============== DEMO SELESAI ===============\n");
 }
