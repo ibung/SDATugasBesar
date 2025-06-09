@@ -91,10 +91,11 @@ void mainMenu(PaperLoader *loader)
         printf("+--------------------------------------------------+\n");
         printf("|           ACADEMIC PAPER MANAGEMENT              |\n");
         printf("+--------------------------------------------------+\n");
-        printf("| Total Papers: %-6d | Total Fields: %-6d          |\n",
+        printf("| Total Papers: %-6d | Total Fields: %-6d      |\n",
                loader->totalPapers, loader->totalFields);
         printf("+--------------------------------------------------+\n");
         printf("|                  MAIN MENU                       |\n");
+        printf("|                                                  |\n");
         printf("| 1. Search Papers by Field of Study               |\n");
         printf("|    - Pencarian berdasarkan bidang studi          |\n");
         printf("| 2. Display All Fields Overview                   |\n");
@@ -105,8 +106,10 @@ void mainMenu(PaperLoader *loader)
         printf("|    - Batalkan operasi pencarian terakhir         |\n");
         printf("| 5. Exit Program                                  |\n");
         printf("|    - Keluar dari sistem                          |\n");
+        printf("|                                                  |\n");
         printf("+--------------------------------------------------+\n");
 
+        printf("\nPilih menu (1-5): ");
         if (scanf("%d", &choice) != 1)
         {
             printf("Input tidak valid! Harap masukkan angka 1-5.\n");
@@ -151,13 +154,13 @@ void searchByField(PaperLoader *loader)
     printf("+==========================================================+\n");
     printf("|                SEARCH BY FIELD OF STUDY                  |\n");
     printf("+==========================================================+\n");
-    printf("\nContoh bidang studi yang tersedia:\n");
-    printf("  Computer Science\n");
-    printf("  Mathematics\n");
-    printf("  Physics\n");
-    printf("  Engineering\n");
-    printf("  Biology\n");
-    printf("  dll.\n\n");
+    printf("\n\tContoh bidang studi yang tersedia:\n");
+    printf("\n  - Computer Science\n");
+    printf("  - Mathematics\n");
+    printf("  - Physics\n");
+    printf("  - Engineering\n");
+    printf("  - Biology\n");
+    printf("  - dll.\n\n");
 
     printf("Masukkan nama bidang studi: ");
     fgets(fieldName, sizeof(fieldName), stdin);
