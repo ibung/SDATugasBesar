@@ -152,16 +152,16 @@ void searchByField(PaperLoader *loader)
     printf("|                SEARCH BY FIELD OF STUDY                  |\n");
     printf("+==========================================================+\n");
     printf("\nContoh bidang studi yang tersedia:\n");
-    printf("   • Computer Science\n");
-    printf("   • Mathematics\n");
-    printf("   • Physics\n");
-    printf("   • Engineering\n");
-    printf("   • Biology\n");
-    printf("   • dll.\n\n");
+    printf("  Computer Science\n");
+    printf("  Mathematics\n");
+    printf("  Physics\n");
+    printf("  Engineering\n");
+    printf("  Biology\n");
+    printf("  dll.\n\n");
 
     printf("Masukkan nama bidang studi: ");
     fgets(fieldName, sizeof(fieldName), stdin);
-    fieldName[strcspn(fieldName, "\n")] = '\0'; // Remove newline
+    fieldName[strcspn(fieldName, "\n")] = '\0'; 
 
     if (strlen(fieldName) == 0)
     {
