@@ -156,7 +156,7 @@ AVLNode* findFieldInAVL(AVLNode* root, const char* fieldOfStudy) {
 void displayFieldsInOrderAscending(AVLNode* root) {
     if (root != NULL) {
         displayFieldsInOrderAscending(root->left);
-        printf("📚 %-25s | Papers: %2d | Height: %d | Balance: %2d\n", 
+        printf("%-25s | Papers: %2d | Height: %d | Balance: %2d\n", 
                root->fieldOfStudy, root->paperCount, root->height, getBalance(root));
         displayFieldsInOrderAscending(root->right);
     }
@@ -166,7 +166,7 @@ void displayFieldsInOrderAscending(AVLNode* root) {
 void displayFieldsInOrderDescending(AVLNode* root) {
     if (root != NULL) {
         displayFieldsInOrderDescending(root->right);
-        printf("📚 %-25s | Papers: %2d | Height: %d | Balance: %2d\n", 
+        printf("%-25s | Papers: %2d | Height: %d | Balance: %2d\n", 
                root->fieldOfStudy, root->paperCount, root->height, getBalance(root));
         displayFieldsInOrderDescending(root->left);
     }
