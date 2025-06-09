@@ -9,9 +9,9 @@ PaperLoader* initPaperLoader() {
     loader->totalPapers = 0;
     loader->totalFields = 0;
     
-    printf("🚀 Paper Loader berhasil diinisialisasi!\n");
-    printf("📚 Citation Manager terintegrasi\n");
-    printf("🌳 AVL Tree siap untuk organisasi berdasarkan bidang studi\n\n");
+    printf("Paper Loader berhasil diinisialisasi!\n");
+    printf("Citation Manager terintegrasi\n");
+    printf("AVL Tree siap untuk organisasi berdasarkan bidang studi\n\n");
     return loader;
 }
 
@@ -143,12 +143,12 @@ JSONPaper* parseJSONPaper(cJSON* jsonObject) {
 int loadJSONData(PaperLoader* loader, const char* filename) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
-        printf("❌ Error: Tidak dapat membuka file %s\n", filename);
+        printf("Error: Tidak dapat membuka file %s\n", filename);
         return 0;
     }
     
-    printf("📖 Memuat data dari file: %s\n", filename);
-    printf("⏳ Sedang parsing JSON Array dan membangun AVL Tree...\n\n");
+    printf("Memuat data dari file: %s\n", filename);
+    printf("Sedang parsing JSON Array dan membangun AVL Tree...\n\n");
     
     // Read entire file into buffer
     fseek(file, 0, SEEK_END);
@@ -157,7 +157,7 @@ int loadJSONData(PaperLoader* loader, const char* filename) {
     
     char* json_buffer = (char*)malloc(file_size + 1);
     if (json_buffer == NULL) {
-        printf("❌ Error: Tidak dapat mengalokasi memory untuk file\n");
+        printf("Error: Tidak dapat mengalokasi memory untuk file\n");
         fclose(file);
         return 0;
     }
@@ -171,12 +171,12 @@ int loadJSONData(PaperLoader* loader, const char* filename) {
     free(json_buffer);
     
     if (json_array == NULL) {
-        printf("❌ Error parsing JSON: %s\n", cJSON_GetErrorPtr());
+        printf("Error parsing JSON: %s\n", cJSON_GetErrorPtr());
         return 0;
     }
     
     if (!cJSON_IsArray(json_array)) {
-        printf("❌ Error: JSON file harus berupa array\n");
+        printf("Error: JSON file harus berupa array\n");
         cJSON_Delete(json_array);
         return 0;
     }
@@ -185,7 +185,7 @@ int loadJSONData(PaperLoader* loader, const char* filename) {
     int paperCount = 0;
     int processedEntries = 0;
     
-    printf("📊 Total papers dalam file: %d\n\n", array_size);
+    printf("Total papers dalam file: %d\n\n", array_size);
     
     // Process each paper in array
     for (int i = 0; i < array_size; i++) {
@@ -199,7 +199,7 @@ int loadJSONData(PaperLoader* loader, const char* filename) {
         JSONPaper* jsonPaper = parseJSONPaper(paper_object);
         if (jsonPaper == NULL) continue;
         
-        printf("📄 Processing [%d/%d]: %.50s%s\n", 
+        printf("Processing [%d/%d]: %.50s%s\n", 
                i + 1, array_size,
                jsonPaper->title,
                strlen(jsonPaper->title) > 50 ? "..." : "");
@@ -224,13 +224,13 @@ int loadJSONData(PaperLoader* loader, const char* filename) {
         
         // Progress indicator
         if (paperCount % 50 == 0) {
-            printf("   📊 Processed %d papers (%d entries)...\n", 
+            printf("Processed %d papers (%d entries)...\n", 
                    paperCount, processedEntries);
         }
         
         // Limit untuk testing (hapus jika ingin load semua)
         if (paperCount >= 100) {
-            printf("⚠️  Limiting to first 100 papers for testing...\n");
+            printf("Limiting to first 100 papers for testing...\n");
             break;
         }
     }
@@ -240,9 +240,9 @@ int loadJSONData(PaperLoader* loader, const char* filename) {
     loader->totalPapers = processedEntries;
     loader->totalFields = countAVLNodes(loader->avlRoot);
     
-    printf("\n✅ Berhasil memuat %d entries dari %d papers!\n", 
+    printf("\nBerhasil memuat %d entries dari %d papers!\n", 
            processedEntries, paperCount);
-    printf("📊 Total bidang studi unik: %d\n\n", loader->totalFields);
+    printf("Total bidang studi unik: %d\n\n", loader->totalFields);
     
     return paperCount;
 }
