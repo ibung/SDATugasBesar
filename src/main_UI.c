@@ -91,20 +91,20 @@ void mainMenu(PaperLoader *loader)
         printf("+--------------------------------------------------+\n");
         printf("|           ACADEMIC PAPER MANAGEMENT              |\n");
         printf("+--------------------------------------------------+\n");
-        printf("| Total Papers: %-6d | Total Fields: %-6d         |\n",
+        printf("| Total Papers: %-6d | Total Fields: %-6d          |\n",
                loader->totalPapers, loader->totalFields);
         printf("+--------------------------------------------------+\n");
-        printf("|                  MAIN MENU                      |\n");
-        printf("| 1. Search Papers by Field of Study              |\n");
-        printf("|    - Pencarian berdasarkan bidang studi         |\n");
-        printf("| 2. Display All Fields Overview                  |\n");
-        printf("|    - Lihat semua bidang studi                   |\n");
-        printf("| 3. Display All Papers with Sorting              |\n");
-        printf("|    - Tampilkan semua paper dengan sorting       |\n");
-        printf("| 4. Undo Last Search Operation                   |\n");
-        printf("|    - Batalkan operasi pencarian terakhir        |\n");
-        printf("| 5. Exit Program                                 |\n");
-        printf("|    - Keluar dari sistem                         |\n");
+        printf("|                  MAIN MENU                       |\n");
+        printf("| 1. Search Papers by Field of Study               |\n");
+        printf("|    - Pencarian berdasarkan bidang studi          |\n");
+        printf("| 2. Display All Fields Overview                   |\n");
+        printf("|    - Lihat semua bidang studi                    |\n");
+        printf("| 3. Display All Papers with Sorting               |\n");
+        printf("|    - Tampilkan semua paper dengan sorting        |\n");
+        printf("| 4. Undo Last Search Operation                    |\n");
+        printf("|    - Batalkan operasi pencarian terakhir         |\n");
+        printf("| 5. Exit Program                                  |\n");
+        printf("|    - Keluar dari sistem                          |\n");
         printf("+--------------------------------------------------+\n");
 
         if (scanf("%d", &choice) != 1)
@@ -148,9 +148,9 @@ void searchByField(PaperLoader *loader)
     char fieldName[100];
 
     clearScreen();
-    printf("╔══════════════════════════════════════════════════════════╗\n");
-    printf("║                SEARCH BY FIELD OF STUDY                 ║\n");
-    printf("╚══════════════════════════════════════════════════════════╝\n");
+    printf("+==========================================================+\n");
+    printf("|                SEARCH BY FIELD OF STUDY                  |\n");
+    printf("+==========================================================+\n");
     printf("\nContoh bidang studi yang tersedia:\n");
     printf("   • Computer Science\n");
     printf("   • Mathematics\n");
@@ -224,24 +224,24 @@ void handleSortingOptions(Paper *paperList, int count)
     int sortChoice;
 
     printf("+--------------------------------------------------------+\n");
-    printf("|                  SORTING OPTIONS                      |\n");
+    printf("|                  SORTING OPTIONS                       |\n");
     printf("+--------------------------------------------------------+\n");
-    printf("|  Pilih metode pengurutan data:                        |\n");
+    printf("|  Pilih metode pengurutan data:                         |\n");
     printf("|                                                        |\n");
-    printf("|  1. Sort by Year (Newest First) - Terbaru             |\n");
-    printf("|     -> Urutkan dari tahun terbaru ke terlama          |\n");
+    printf("|  1. Sort by Year (Newest First) - Terbaru              |\n");
+    printf("|     -> Urutkan dari tahun terbaru ke terlama           |\n");
     printf("|                                                        |\n");
-    printf("|  2. Sort by Year (Oldest First) - Terlama             |\n");
-    printf("|     -> Urutkan dari tahun terlama ke terbaru          |\n");
+    printf("|  2. Sort by Year (Oldest First) - Terlama              |\n");
+    printf("|     -> Urutkan dari tahun terlama ke terbaru           |\n");
     printf("|                                                        |\n");
-    printf("|  3. Sort by Citations (Most Popular) - Populer        |\n");
-    printf("|     -> Urutkan dari yang paling banyak dikutip        |\n");
+    printf("|  3. Sort by Citations (Most Popular) - Populer         |\n");
+    printf("|     -> Urutkan dari yang paling banyak dikutip         |\n");
     printf("|                                                        |\n");
-    printf("|  4. Sort by Citations (Least Popular) - Kurang        |\n");
-    printf("|     -> Urutkan dari yang paling sedikit dikutip       |\n");
+    printf("|  4. Sort by Citations (Least Popular) - Kurang         |\n");
+    printf("|     -> Urutkan dari yang paling sedikit dikutip        |\n");
     printf("|                                                        |\n");
-    printf("|  5. Default Order - Tanpa pengurutan                  |\n");
-    printf("|     -> Tampilkan sesuai urutan asli                   |\n");
+    printf("|  5. Default Order - Tanpa pengurutan                   |\n");
+    printf("|     -> Tampilkan sesuai urutan asli                    |\n");
     printf("+--------------------------------------------------------+\n");
     printf("\nPilihan sorting (1-5): ");
 
@@ -341,15 +341,15 @@ void displayAllFields(PaperLoader *loader)
 
     clearScreen();
     printf("+-----------------------------------------------------------+\n");
-    printf("|                DISPLAY ALL FIELDS                        |\n");
+    printf("|                DISPLAY ALL FIELDS                         |\n");
     printf("+-----------------------------------------------------------+\n");
-    printf("|  Pilih urutan tampilan bidang studi:                     |\n");
+    printf("|  Pilih urutan tampilan bidang studi:                      |\n");
     printf("|                                                           |\n");
-    printf("|  1. Ascending (A-Z) - Alfabetis Naik                     |\n");
-    printf("|     -> Tampilkan dari A sampai Z                         |\n");
+    printf("|  1. Ascending (A-Z) - Alfabetis Naik                      |\n");
+    printf("|     -> Tampilkan dari A sampai Z                          |\n");
     printf("|                                                           |\n");
-    printf("|  2. Descending (Z-A) - Alfabetis Turun                  |\n");
-    printf("|     -> Tampilkan dari Z sampai A                         |\n");
+    printf("|  2. Descending (Z-A) - Alfabetis Turun                    |\n");
+    printf("|     -> Tampilkan dari Z sampai A                          |\n");
     printf("+-----------------------------------------------------------+\n");
     printf("\nPilihan urutan (1-2): ");
 
@@ -364,9 +364,9 @@ void displayAllFields(PaperLoader *loader)
 
     clearScreen();
     printf("+=============================================================================+\n");
-    printf("|                        FIELDS OF STUDY OVERVIEW                            |\n");
+    printf("|                        FIELDS OF STUDY OVERVIEW                             |\n");
     printf("+-----------------------------------------------------------------------------+\n");
-    printf("| Field Name                    | Papers | Height | Balance | AVL Info       |\n");
+    printf("| Field Name                    | Papers | Height | Balance | AVL Info        |\n");
     printf("+=============================================================================+\n");
 
     if (displayChoice == 2)
@@ -382,7 +382,7 @@ void displayAllFields(PaperLoader *loader)
     printf("| STATISTIK:                                                                  |\n");
     printf("|   - Total unique fields : %-3d                                              |\n", loader->totalFields);
     printf("|   - Total papers loaded  : %-4d                                             |\n", loader->totalPapers);
-    printf("|   - AVL Tree structure   : Balanced untuk pencarian optimal                |\n");
+    printf("|   - AVL Tree structure   : Balanced untuk pencarian optimal                 |\n");
     printf("+=============================================================================+\n");
 
     // Push ke history
@@ -396,7 +396,7 @@ void displayAllPapersWithSorting(PaperLoader *loader)
 {
     clearScreen();
     printf("+==========================================================+\n");
-    printf("|           DISPLAY ALL PAPERS WITH SORTING               |\n");
+    printf("|           DISPLAY ALL PAPERS WITH SORTING                |\n");
     printf("+==========================================================+\n");
     printf("\nMengumpulkan semua papers dari database...\n");
 
@@ -435,7 +435,7 @@ void undoSearch(PaperLoader *loader)
 {
     clearScreen();
     printf("+==========================================================+\n");
-    printf("|                UNDO LAST SEARCH                         |\n");
+    printf("|                UNDO LAST SEARCH                          |\n");
     printf("+==========================================================+\n");
 
     if (loader->citationManager->historyTop == NULL)
