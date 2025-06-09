@@ -64,11 +64,9 @@ AVLNode* createAVLNode(const char* fieldOfStudy) {
 
 // Insert paper ke AVL Tree berdasarkan bidang studi
 AVLNode* insertToAVL(AVLNode* root, Paper* paper) {
-    // 1. Lakukan BST insertion biasa
     if (root == NULL) {
         AVLNode* newNode = createAVLNode(paper->field_of_study);
         
-        // Buat CitationNode untuk paper ini
         CitationNode* citationNode = (CitationNode*)malloc(sizeof(CitationNode));
         citationNode->paper = paper;
         citationNode->next = NULL;
@@ -102,8 +100,7 @@ AVLNode* insertToAVL(AVLNode* root, Paper* paper) {
     }
     
     // 2. Update tinggi node
-    root->height = 1 + ((getHeight(root->left) > getHeight(root->right)) ? 
-                        getHeight(root->left) : getHeight(root->right));
+    root->height = 1 + ((getHeight(root->left) > getHeight(root->right)) ? getHeight(root->left) : getHeight(root->right));
     
     // 3. Cek balance factor
     int balance = getBalance(root);

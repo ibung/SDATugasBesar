@@ -230,7 +230,7 @@ int loadJSONData(PaperLoader* loader, const char* filename) {
         
         // Limit untuk testing (hapus jika ingin load semua)
         if (paperCount >= 1000) {
-            printf("Limiting to first 100 papers for testing...\n");
+            printf("Limiting to first 1000 papers for testing...\n");
             break;
         }
     }
