@@ -99,6 +99,21 @@ int extractFieldsOfStudy(cJSON* fieldsArray, char fields[][150]) {
     return count;
 }
 
+// Tambahkan setelah fungsi extractFieldsOfStudy
+int countCitations(cJSON* jsonObject) {
+    cJSON* inCitationsArray = cJSON_GetObjectItem(jsonObject, "inCitations");
+    
+    if (inCitationsArray == NULL) {
+        return 0;
+    }
+    
+    if (!cJSON_IsArray(inCitationsArray)) {
+        return 0;
+    }
+    
+    return cJSON_GetArraySize(inCitationsArray);
+}
+
 // FIXED: Parse JSON object menjadi JSONPaper
 JSONPaper* parseJSONPaper(cJSON* jsonObject) {
     if (jsonObject == NULL) {
@@ -129,12 +144,7 @@ JSONPaper* parseJSONPaper(cJSON* jsonObject) {
     paper->fieldCount = extractFieldsOfStudy(fieldsArray, paper->fieldsOfStudy);
     
     // FIXED: Extract citation count from inCitations array
-    cJSON* inCitationsArray = cJSON_GetObjectItem(jsonObject, "inCitations");
-    if (cJSON_IsArray(inCitationsArray)) {
-        paper->citationCount = cJSON_GetArraySize(inCitationsArray);
-    } else {
-        paper->citationCount = 0;
-    }
+    paper->citationCount = countCitations(jsonObject);
     
     return paper;
 }
