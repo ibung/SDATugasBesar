@@ -1,6 +1,7 @@
 #include "../include/json_loader.h"
 #include "../include/avl_paper_loader.h"
 #include "../include/cJSON.h"
+#include "../include/citation_stack.h"
 
 PaperLoader* initPaperLoader() {
     PaperLoader* loader = (PaperLoader*)malloc(sizeof(PaperLoader));
@@ -147,6 +148,20 @@ JSONPaper* parseJSONPaper(cJSON* jsonObject) {
     paper->citationCount = countCitations(jsonObject);
     
     return paper;
+}
+
+Paper* convertJSONPaperToPaper(JSONPaper* jsonPaper) {
+    if (jsonPaper == NULL) return NULL;
+
+    const char* field = (jsonPaper->fieldCount > 0) ? jsonPaper->fieldsOfStudy[0] : "General";
+
+    return createPaper(
+        jsonPaper->title,
+        jsonPaper->authors,
+        jsonPaper->year,
+        field,
+        jsonPaper->citationCount
+    );
 }
 
 // FIXED: Load data dari file JSON Array format
