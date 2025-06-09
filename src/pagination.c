@@ -82,7 +82,7 @@ void display_current_tab(PaginationSystem* pagination) {
         printf("%d. Title: %s\n", ((tab->tab_number - 1) * 10) + i + 1, paper->title);
         printf("   Field: %s\n", paper->field_of_study);
         printf("   Year: %d\n", paper->year);
-        printf("   Citations: %d\n", paper->citation_count);
+        printf("   Citations: %d\n", paper->citations);
         printf("   --------------------------------------------------\n");
     }
     
