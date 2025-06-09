@@ -340,17 +340,17 @@ void displayAllFields(PaperLoader *loader)
     int displayChoice;
 
     clearScreen();
-    printf("╔═══════════════════════════════════════════════════════════╗\n");
-    printf("║                DISPLAY ALL FIELDS                         ║\n");
-    printf("╠═══════════════════════════════════════════════════════════╣\n");
-    printf("║  Pilih urutan tampilan bidang studi:                     ║\n");
-    printf("║                                                           ║\n");
-    printf("║  1. Ascending (A-Z) - Alfabetis Naik                     ║\n");
-    printf("║     └─ Tampilkan dari A sampai Z                        ║\n");
-    printf("║                                                           ║\n");
-    printf("║  2. Descending (Z-A) - Alfabetis Turun                  ║\n");
-    printf("║     └─ Tampilkan dari Z sampai A                        ║\n");
-    printf("╚═══════════════════════════════════════════════════════════╝\n");
+    printf("+-----------------------------------------------------------+\n");
+    printf("|                DISPLAY ALL FIELDS                        |\n");
+    printf("+-----------------------------------------------------------+\n");
+    printf("|  Pilih urutan tampilan bidang studi:                     |\n");
+    printf("|                                                           |\n");
+    printf("|  1. Ascending (A-Z) - Alfabetis Naik                     |\n");
+    printf("|     -> Tampilkan dari A sampai Z                         |\n");
+    printf("|                                                           |\n");
+    printf("|  2. Descending (Z-A) - Alfabetis Turun                  |\n");
+    printf("|     -> Tampilkan dari Z sampai A                         |\n");
+    printf("+-----------------------------------------------------------+\n");
     printf("\nPilihan urutan (1-2): ");
 
     if (scanf("%d", &displayChoice) != 1)
