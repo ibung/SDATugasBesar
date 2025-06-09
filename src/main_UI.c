@@ -106,6 +106,7 @@ void mainMenu(PaperLoader *loader)
         printf("| 5. Exit Program                                 |\n");
         printf("|    - Keluar dari sistem                         |\n");
         printf("+--------------------------------------------------+\n");
+        printf("Pilihan Anda (1-5): ");
 
         if (scanf("%d", &choice) != 1)
         {
@@ -145,23 +146,29 @@ void mainMenu(PaperLoader *loader)
 
 void searchByField(PaperLoader *loader)
 {
-    char fieldName[100];
+    char fieldName[150];
 
     clearScreen();
-    printf("╔══════════════════════════════════════════════════════════╗\n");
-    printf("║                SEARCH BY FIELD OF STUDY                 ║\n");
-    printf("╚══════════════════════════════════════════════════════════╝\n");
-    printf("\nContoh bidang studi yang tersedia:\n");
-    printf("   • Computer Science\n");
-    printf("   • Mathematics\n");
-    printf("   • Physics\n");
-    printf("   • Engineering\n");
-    printf("   • Biology\n");
-    printf("   • dll.\n\n");
+    printf("=============================================================\n");
+    printf("||                SEARCH BY FIELD OF STUDY                 ||\n");
+    printf("=============================================================\n");
+    printf("\nContoh bidang studi yang tersedia:\n\n");
+    printf("- Computer Science\n");
+    printf("- Mathematics,\n");
+    printf("- Physics,\n");
+    printf("- Engineering,\n");
+    printf("- Biology,\n");
+    printf("- ...\n\n");
 
     printf("Masukkan nama bidang studi: ");
-    fgets(fieldName, sizeof(fieldName), stdin);
-    fieldName[strcspn(fieldName, "\n")] = '\0'; // Remove newline
+    if (fgets(fieldName, sizeof(fieldName), stdin) == NULL) {
+        printf("Error membaca input!\n");
+        pressEnterToContinue();
+        return;
+    }
+    
+    // Remove newline character
+    fieldName[strcspn(fieldName, "\n")] = '\0';
 
     if (strlen(fieldName) == 0)
     {
@@ -181,8 +188,8 @@ void searchByField(PaperLoader *loader)
         printf("Tips: Pastikan penulisan bidang studi benar dan case-sensitive\n");
 
         // Push ke history even if not found
-        char details[200];
-        snprintf(details, sizeof(details), "Search failed for field: %s", fieldName);
+        char details[250];
+        snprintf(details, sizeof(details), "Search failed for field: %.100s", fieldName);
         pushHistory(loader->citationManager, "SEARCH_FIELD", details);
 
         pressEnterToContinue();
@@ -197,16 +204,17 @@ void searchByField(PaperLoader *loader)
     int paperCount = 0;
     Paper *paperList = convertCitationsToPaperList(fieldNode->paperList, &paperCount);
 
-    if (paperList == NULL)
+    if (paperList == NULL || paperCount == 0)
     {
-        printf("Error dalam konversi data!\n");
+        printf("Error dalam konversi data atau tidak ada data!\n");
+        if (paperList) free(paperList);
         pressEnterToContinue();
         return;
     }
 
     // Push ke history
-    char details[200];
-    snprintf(details, sizeof(details), "Found %d papers in field: %s", paperCount, fieldName);
+    char details[250];
+    snprintf(details, sizeof(details), "Found %d papers in field: %.100s", paperCount, fieldName);
     pushHistory(loader->citationManager, "SEARCH_FIELD", details);
 
     // Handle sorting options
@@ -263,28 +271,62 @@ void handleSortingOptions(Paper *paperList, int count)
         return;
     }
 
-    // Convert array to linked list head for sorting functions
-    Paper *head = &paperList[0];
-
     printf("\nMelakukan sorting...");
     fflush(stdout);
 
+    // Use simple array-based sorting instead of linked list
     switch (sortChoice)
     {
     case 1:
-        sort_papers_by_year(&head, 1); // Newest first
+        // Sort by year (newest first) - Bubble sort
+        for (int i = 0; i < count - 1; i++) {
+            for (int j = 0; j < count - i - 1; j++) {
+                if (paperList[j].year < paperList[j + 1].year) {
+                    Paper temp = paperList[j];
+                    paperList[j] = paperList[j + 1];
+                    paperList[j + 1] = temp;
+                }
+            }
+        }
         printf(" Sorted by year (newest first)\n");
         break;
     case 2:
-        sort_papers_by_year(&head, 0); // Oldest first
+        // Sort by year (oldest first)
+        for (int i = 0; i < count - 1; i++) {
+            for (int j = 0; j < count - i - 1; j++) {
+                if (paperList[j].year > paperList[j + 1].year) {
+                    Paper temp = paperList[j];
+                    paperList[j] = paperList[j + 1];
+                    paperList[j + 1] = temp;
+                }
+            }
+        }
         printf(" Sorted by year (oldest first)\n");
         break;
     case 3:
-        sort_papers_by_citations(&head, 1); // Most popular
+        // Sort by citations (most popular)
+        for (int i = 0; i < count - 1; i++) {
+            for (int j = 0; j < count - i - 1; j++) {
+                if (paperList[j].citations < paperList[j + 1].citations) {
+                    Paper temp = paperList[j];
+                    paperList[j] = paperList[j + 1];
+                    paperList[j + 1] = temp;
+                }
+            }
+        }
         printf(" Sorted by citations (most popular)\n");
         break;
     case 4:
-        sort_papers_by_citations(&head, 0); // Least popular
+        // Sort by citations (least popular)
+        for (int i = 0; i < count - 1; i++) {
+            for (int j = 0; j < count - i - 1; j++) {
+                if (paperList[j].citations > paperList[j + 1].citations) {
+                    Paper temp = paperList[j];
+                    paperList[j] = paperList[j + 1];
+                    paperList[j + 1] = temp;
+                }
+            }
+        }
         printf(" Sorted by citations (least popular)\n");
         break;
     case 5:
@@ -294,6 +336,7 @@ void handleSortingOptions(Paper *paperList, int count)
     }
 
     printf("Data siap untuk ditampilkan dengan pagination\n");
+    pressEnterToContinue();
 }
 
 void handlePagination(Paper *paperList, int count)
@@ -405,10 +448,11 @@ void displayAllPapersWithSorting(PaperLoader *loader)
     Paper *allPapers = convertCitationsToPaperList(
         loader->citationManager->citationHead, &totalCount);
 
-    if (allPapers == NULL)
+    if (allPapers == NULL || totalCount == 0)
     {
         printf("Tidak ada data papers yang tersedia!\n");
         printf("Pastikan data JSON telah dimuat dengan benar\n");
+        if (allPapers) free(allPapers);
         pressEnterToContinue();
         return;
     }
@@ -480,18 +524,27 @@ Paper *convertCitationsToPaperList(CitationNode *citationHead, int *count)
         current = current->next;
     }
 
+    if (*count == 0) {
+        return NULL;
+    }
+
     // Allocate array
     Paper *paperList = (Paper *)malloc(*count * sizeof(Paper));
-    if (paperList == NULL)
+    if (paperList == NULL) {
+        *count = 0;
         return NULL;
+    }
 
     // Copy data with proper error checking
     current = citationHead;
-    for (int i = 0; i < *count; i++)
+    for (int i = 0; i < *count && current != NULL; i++)
     {
-        if (current != NULL && current->paper != NULL)
+        if (current->paper != NULL)
         {
-            // Copy paper data with correct member names
+            // Initialize the paper structure
+            memset(&paperList[i], 0, sizeof(Paper));
+            
+            // Copy paper data with safe string operations
             strncpy(paperList[i].title, current->paper->title, sizeof(paperList[i].title) - 1);
             paperList[i].title[sizeof(paperList[i].title) - 1] = '\0';
 
@@ -503,11 +556,19 @@ Paper *convertCitationsToPaperList(CitationNode *citationHead, int *count)
 
             paperList[i].year = current->paper->year;
             paperList[i].citations = current->paper->citations;
+            paperList[i].citation_count = current->paper->citations; // Use same value for both
 
-            // Set up linked list pointers for sorting
-            paperList[i].next = (i < *count - 1) ? &paperList[i + 1] : NULL;
-            paperList[i].prev = (i > 0) ? &paperList[i - 1] : NULL;
+            // Initialize linked list pointers to NULL for array-based sorting
+            paperList[i].next = NULL;
+            paperList[i].prev = NULL;
+            paperList[i].citations_head = NULL;
 
+            current = current->next;
+        }
+        else 
+        {
+            // Skip this iteration if paper is NULL
+            i--; // Decrement to retry this index
             current = current->next;
         }
     }
