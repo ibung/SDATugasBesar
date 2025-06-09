@@ -223,26 +223,26 @@ void handleSortingOptions(Paper *paperList, int count)
 {
     int sortChoice;
 
-    printf("╔════════════════════════════════════════════════════════╗\n");
-    printf("║                  SORTING OPTIONS                       ║\n");
-    printf("╠════════════════════════════════════════════════════════╣\n");
-    printf("║  Pilih metode pengurutan data:                        ║\n");
-    printf("║                                                        ║\n");
-    printf("║  1. Sort by Year (Newest First) - Terbaru             ║\n");
-    printf("║     └─ Urutkan dari tahun terbaru ke terlama         ║\n");
-    printf("║                                                        ║\n");
-    printf("║  2. Sort by Year (Oldest First) - Terlama             ║\n");
-    printf("║     └─ Urutkan dari tahun terlama ke terbaru         ║\n");
-    printf("║                                                        ║\n");
-    printf("║  3. Sort by Citations (Most Popular) - Populer        ║\n");
-    printf("║     └─ Urutkan dari yang paling banyak dikutip       ║\n");
-    printf("║                                                        ║\n");
-    printf("║  4. Sort by Citations (Least Popular) - Kurang        ║\n");
-    printf("║     └─ Urutkan dari yang paling sedikit dikutip      ║\n");
-    printf("║                                                        ║\n");
-    printf("║  5. Default Order - Tanpa pengurutan                  ║\n");
-    printf("║     └─ Tampilkan sesuai urutan asli                  ║\n");
-    printf("╚════════════════════════════════════════════════════════╝\n");
+    printf("+--------------------------------------------------------+\n");
+    printf("|                  SORTING OPTIONS                      |\n");
+    printf("+--------------------------------------------------------+\n");
+    printf("|  Pilih metode pengurutan data:                        |\n");
+    printf("|                                                        |\n");
+    printf("|  1. Sort by Year (Newest First) - Terbaru             |\n");
+    printf("|     -> Urutkan dari tahun terbaru ke terlama          |\n");
+    printf("|                                                        |\n");
+    printf("|  2. Sort by Year (Oldest First) - Terlama             |\n");
+    printf("|     -> Urutkan dari tahun terlama ke terbaru          |\n");
+    printf("|                                                        |\n");
+    printf("|  3. Sort by Citations (Most Popular) - Populer        |\n");
+    printf("|     -> Urutkan dari yang paling banyak dikutip        |\n");
+    printf("|                                                        |\n");
+    printf("|  4. Sort by Citations (Least Popular) - Kurang        |\n");
+    printf("|     -> Urutkan dari yang paling sedikit dikutip       |\n");
+    printf("|                                                        |\n");
+    printf("|  5. Default Order - Tanpa pengurutan                  |\n");
+    printf("|     -> Tampilkan sesuai urutan asli                   |\n");
+    printf("+--------------------------------------------------------+\n");
     printf("\nPilihan sorting (1-5): ");
 
     if (scanf("%d", &sortChoice) != 1)
