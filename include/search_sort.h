@@ -44,7 +44,19 @@ typedef struct SearchResult {
 // Fungsi utama untuk searching dan sorting
 SearchResult* performSearchAndSort(PaperLoader* loader, const char* fieldOfStudy, 
                                  SortCriteria criteria, SortOrder order);
+/**
+ * @brief Sort papers by year (wrapper for main_UI.c compatibility)
+ * @param headRef Pointer to pointer of head node
+ * @param ascending true for ascending, false for descending
+ */
+void sort_papers_by_year(CitationNode** headRef, bool ascending);
 
+/**
+ * @brief Sort papers by citations (wrapper for main_UI.c compatibility)
+ * @param headRef Pointer to pointer of head node  
+ * @param ascending true for ascending, false for descending
+ */
+void sort_papers_by_citations(CitationNode** headRef, bool ascending);
 // Fungsi untuk traversal dan sorting seluruh AVL tree
 SearchResult* traverseAndSortAVL(PaperLoader* loader, SortCriteria criteria, SortOrder order);
 

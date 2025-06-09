@@ -243,6 +243,9 @@ SearchResult *traverseAndSortAVL(PaperLoader *loader, SortCriteria criteria, Sor
 
     printf(" -> [Info] Fungsi 'traverseAndSortAVL' untuk pencarian global.\n");
     printf(" -> [Info] Fitur ini dapat diimplementasikan untuk sorting seluruh database.\n");
+    printf(" -> [Info] Kriteria: %s, Urutan: %s\n", 
+           sortCriteriaToString(criteria), 
+           sortOrderToString(order));
 
     // TODO: Implementasi untuk traversal seluruh AVL tree
     // Saat ini mengembalikan NULL sebagai placeholder
@@ -305,11 +308,12 @@ void displaySearchResult(const SearchResult *result)
         Paper *p = result->papers[i];
         if (p)
         {
-            printf("[%d] %s\n", i + 1, p->title ? p->title : "No Title");
-            printf("    Author    : %s\n", p->authors ? p->authors : "Unknown");
+            // Check if strings are empty instead of NULL (since they're arrays)
+            printf("[%d] %s\n", i + 1, (strlen(p->title) > 0) ? p->title : "No Title");
+            printf("    Author    : %s\n", (strlen(p->authors) > 0) ? p->authors : "Unknown");
             printf("    Tahun     : %d\n", p->year);
             printf("    Sitasi    : %d\n", p->citation_count);
-            printf("    Bidang    : %s\n\n", p->field_of_study ? p->field_of_study : "Unknown");
+            printf("    Bidang    : %s\n\n", (strlen(p->field_of_study) > 0) ? p->field_of_study : "Unknown");
         }
     }
     if (result->count > limit)
@@ -318,6 +322,22 @@ void displaySearchResult(const SearchResult *result)
     }
     printf("======================================================\n");
 }
+void sort_papers_by_year(CitationNode** headRef, bool ascending)
+{
+    SortOrder order = ascending ? SORT_ASC : SORT_DESC;
+    sortPaperListSLL(headRef, SORT_BY_YEAR, order);
+}
+
+/**
+ * @brief Wrapper function untuk sort by citations
+ * Digunakan oleh main_UI.c untuk kompatibilitas  
+ */
+void sort_papers_by_citations(CitationNode** headRef, bool ascending)
+{
+    SortOrder order = ascending ? SORT_ASC : SORT_DESC;
+    sortPaperListSLL(headRef, SORT_BY_CITATIONS, order);
+}
+
 
 /**
  * @brief Membebaskan memori yang dialokasikan untuk SearchResult.
