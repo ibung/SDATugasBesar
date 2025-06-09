@@ -14,9 +14,11 @@ typedef struct Citation {
 
 typedef struct Paper {
     char title[256];
+    char authors[100];
     char field_of_study[100];
     int year;
-    int citation_count;
+    int citations;
+    int citation_count;  // Total citations from inCitations
     Citation* citations_head;
     struct Paper* next;
     struct Paper* prev;

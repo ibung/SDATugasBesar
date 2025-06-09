@@ -1,5 +1,5 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -std=c99 -g -Iinclude
+CC = gcc 
+CFLAGS = -Wall -Wextra -std=c99 -g -Iinclude -finput-charset=UTF-8
 TARGET = runprogram
 
 SOURCES := $(wildcard src/*.c)

@@ -10,12 +10,12 @@ CitationManager* initCitationManager() {
 }
 
 // Membuat paper baru
-Paper* createPaper(const char* title, const char* author, int year, const char* bidang_studi, int citations) {
+Paper* createPaper(const char* title, const char* authors, int year, const char* field_of_study, int citations) {
     Paper* newPaper = (Paper*)malloc(sizeof(Paper));
     strcpy(newPaper->title, title);
-    strcpy(newPaper->author, author);
+    strcpy(newPaper->authors, authors);
     newPaper->year = year;
-    strcpy(newPaper->bidang_studi, bidang_studi);
+    strcpy(newPaper->field_of_study, field_of_study);
     newPaper->citations = citations;
     newPaper->next = NULL;
     return newPaper;
@@ -39,9 +39,9 @@ void addCitation(CitationManager* manager, Paper* paper) {
     
     manager->citationCount++;
     
-    // Push ke history
+    // Push ke history dengan safe string formatting
     char details[200];
-    sprintf(details, "Added citation: %s", paper->title);
+    snprintf(details, sizeof(details), "Added citation: %.160s", paper->title);
     pushHistory(manager, "ADD_CITATION", details);
     
     printf("Citation added successfully!\n");
@@ -61,9 +61,9 @@ void removeCitation(CitationManager* manager, int index) {
     if (index == 1) {
         manager->citationHead = current->next;
         
-        // Push ke history sebelum free
+        // Push ke history sebelum free dengan safe string formatting
         char details[200];
-        sprintf(details, "Removed citation: %s", current->paper->title);
+        snprintf(details, sizeof(details), "Removed citation: %.158s", current->paper->title);
         pushHistory(manager, "REMOVE_CITATION", details);
         
         free(current->paper);
@@ -82,9 +82,9 @@ void removeCitation(CitationManager* manager, int index) {
     if (current != NULL) {
         prev->next = current->next;
         
-        // Push ke history sebelum free
+        // Push ke history sebelum free dengan safe string formatting
         char details[200];
-        sprintf(details, "Removed citation: %s", current->paper->title);
+        snprintf(details, sizeof(details), "Removed citation: %.158s", current->paper->title);
         pushHistory(manager, "REMOVE_CITATION", details);
         
         free(current->paper);
@@ -111,7 +111,7 @@ void displayCitations(CitationManager* manager) {
         Paper* paper = current->paper;
         // Format citation akademik dengan bidang studi
         printf("[%d] %s (%d). %s. Bidang Studi: %s. Citations: %d\n", 
-               index, paper->author, paper->year, paper->title, paper->bidang_studi, paper->citations);
+               index, paper->authors, paper->year, paper->title, paper->field_of_study, paper->citations);
         printf("    ------------------------\n");
         
         current = current->next;
