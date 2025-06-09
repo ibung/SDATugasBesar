@@ -1,4 +1,4 @@
-#include "citation_stack.h"
+#include "../include/citation_stack.h"
 
 // Inisialisasi Citation Manager
 CitationManager* initCitationManager() {
