@@ -10,7 +10,6 @@
 // Forward declaration untuk menghindari circular dependency
 typedef struct PaperLoader PaperLoader;
 
-// ========== STRUKTUR TAMBAHAN UNTUK AVL TREE ==========
 
 // Node AVL Tree berdasarkan bidang studi
 typedef struct AVLNode {

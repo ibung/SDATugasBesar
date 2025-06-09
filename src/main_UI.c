@@ -263,28 +263,26 @@ void handleSortingOptions(Paper *paperList, int count)
         return;
     }
 
-    // Convert array to linked list head for sorting functions
-    Paper *head = &paperList[0];
-
     printf("\nMelakukan sorting...");
     fflush(stdout);
 
+    // Option 1: Create a custom Paper sorting function
     switch (sortChoice)
     {
     case 1:
-        sort_papers_by_year(&head, 1); // Newest first
+        sortPapersByYear(paperList, count, true); // Newest first
         printf(" Sorted by year (newest first)\n");
         break;
     case 2:
-        sort_papers_by_year(&head, 0); // Oldest first
+        sortPapersByYear(paperList, count, false); // Oldest first
         printf(" Sorted by year (oldest first)\n");
         break;
     case 3:
-        sort_papers_by_citations(&head, 1); // Most popular
+        sortPapersByCitations(paperList, count, true); // Most popular
         printf(" Sorted by citations (most popular)\n");
         break;
     case 4:
-        sort_papers_by_citations(&head, 0); // Least popular
+        sortPapersByCitations(paperList, count, false); // Least popular
         printf(" Sorted by citations (least popular)\n");
         break;
     case 5:

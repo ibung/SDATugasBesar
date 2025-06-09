@@ -468,3 +468,57 @@ void demonstrateSearchAndSort(PaperLoader *loader)
 
     printf("\n=== DEMONSTRASI SELESAI ===\n");
 }
+
+void sortPapersByYear(Paper *papers, int count, bool ascending)
+{
+    if (!papers || count <= 1) {
+        return;
+    }
+    
+    // Simple bubble sort implementation for Paper array
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            bool shouldSwap;
+            
+            if (ascending) {
+                shouldSwap = (papers[j].year > papers[j + 1].year);
+            } else {
+                shouldSwap = (papers[j].year < papers[j + 1].year);
+            }
+            
+            if (shouldSwap) {
+                // Swap papers[j] and papers[j + 1]
+                Paper temp = papers[j];
+                papers[j] = papers[j + 1];
+                papers[j + 1] = temp;
+            }
+        }
+    }
+}
+
+void sortPapersByCitations(Paper *papers, int count, bool ascending)
+{
+    if (!papers || count <= 1) {
+        return;
+    }
+    
+    // Simple bubble sort implementation for Paper array
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            bool shouldSwap;
+            
+            if (ascending) {
+                shouldSwap = (papers[j].citation_count > papers[j + 1].citation_count);
+            } else {
+                shouldSwap = (papers[j].citation_count < papers[j + 1].citation_count);
+            }
+            
+            if (shouldSwap) {
+                // Swap papers[j] and papers[j + 1]
+                Paper temp = papers[j];
+                papers[j] = papers[j + 1];
+                papers[j + 1] = temp;
+            }
+        }
+    }
+}

@@ -101,4 +101,22 @@ int countPapersInResult(const SearchResult* result);
 // Fungsi untuk mencari paper berdasarkan index dalam hasil
 Paper* getPaperFromResult(const SearchResult* result, int index);
 
+// Add these declarations to your header file or at the top of main_UI.c
+
+/**
+ * @brief Sort Paper array by year
+ * @param papers Array of Paper structures
+ * @param count Number of papers in the array
+ * @param ascending true for ascending (oldest first), false for descending (newest first)
+ */
+void sortPapersByYear(Paper *papers, int count, bool ascending);
+
+/**
+ * @brief Sort Paper array by citations
+ * @param papers Array of Paper structures
+ * @param count Number of papers in the array
+ * @param ascending true for ascending (least cited first), false for descending (most cited first)
+ */
+void sortPapersByCitations(Paper *papers, int count, bool ascending);
+
 #endif // SEARCH_SORT_H
