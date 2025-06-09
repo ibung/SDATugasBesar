@@ -363,11 +363,11 @@ void displayAllFields(PaperLoader *loader)
     getchar();
 
     clearScreen();
-    printf("╔═════════════════════════════════════════════════════════════════════════════╗\n");
-    printf("║                        FIELDS OF STUDY OVERVIEW                            ║\n");
-    printf("╠═════════════════════════════════════════════════════════════════════════════╣\n");
-    printf("║ Field Name                    │ Papers │ Height │ Balance │ AVL Info       ║\n");
-    printf("╠═════════════════════════════════════════════════════════════════════════════╣\n");
+    printf("+=============================================================================+\n");
+    printf("|                        FIELDS OF STUDY OVERVIEW                            |\n");
+    printf("+-----------------------------------------------------------------------------+\n");
+    printf("| Field Name                    | Papers | Height | Balance | AVL Info       |\n");
+    printf("+=============================================================================+\n");
 
     if (displayChoice == 2)
     {
@@ -378,12 +378,12 @@ void displayAllFields(PaperLoader *loader)
         displayFieldsInOrderAscending(loader->avlRoot);
     }
 
-    printf("╠═════════════════════════════════════════════════════════════════════════════╣\n");
-    printf("║ STATISTIK:                                                                 ║\n");
-    printf("║   • Total unique fields: %-3d                                             ║\n", loader->totalFields);
-    printf("║   • Total papers loaded: %-4d                                            ║\n", loader->totalPapers);
-    printf("║   • AVL Tree structure: Balanced untuk pencarian optimal                   ║\n");
-    printf("╚═════════════════════════════════════════════════════════════════════════════╝\n");
+    printf("+=============================================================================+\n");
+    printf("| STATISTIK:                                                                  |\n");
+    printf("|   - Total unique fields : %-3d                                              |\n", loader->totalFields);
+    printf("|   - Total papers loaded  : %-4d                                             |\n", loader->totalPapers);
+    printf("|   - AVL Tree structure   : Balanced untuk pencarian optimal                |\n");
+    printf("+=============================================================================+\n");
 
     // Push ke history
     pushHistory(loader->citationManager, "VIEW_ALL_FIELDS",
@@ -395,9 +395,9 @@ void displayAllFields(PaperLoader *loader)
 void displayAllPapersWithSorting(PaperLoader *loader)
 {
     clearScreen();
-    printf("╔══════════════════════════════════════════════════════════╗\n");
-    printf("║           DISPLAY ALL PAPERS WITH SORTING               ║\n");
-    printf("╚══════════════════════════════════════════════════════════╝\n");
+    printf("+==========================================================+\n");
+    printf("|           DISPLAY ALL PAPERS WITH SORTING               |\n");
+    printf("+==========================================================+\n");
     printf("\nMengumpulkan semua papers dari database...\n");
 
     // Convert all citations to paper list
@@ -434,9 +434,9 @@ void displayAllPapersWithSorting(PaperLoader *loader)
 void undoSearch(PaperLoader *loader)
 {
     clearScreen();
-    printf("╔══════════════════════════════════════════════════════════╗\n");
-    printf("║                UNDO LAST SEARCH                         ║\n");
-    printf("╚══════════════════════════════════════════════════════════╝\n");
+    printf("+==========================================================+\n");
+    printf("|                UNDO LAST SEARCH                         |\n");
+    printf("+==========================================================+\n");
 
     if (loader->citationManager->historyTop == NULL)
     {
@@ -447,7 +447,6 @@ void undoSearch(PaperLoader *loader)
     }
 
     printf("Current search history:\n");
-    printf("════════════════════════════════════════════════════════════\n");
 
     // Display current history
     displayHistory(loader->citationManager);
