@@ -75,15 +75,16 @@ static CitationNode *sortedMergeInternal(CitationNode *a, CitationNode *b, SortC
     }
     else
     { // SORT_BY_CITATIONS
+        // PERBAIKAN: Gunakan field 'citations' bukan 'citation_count'
         // Jika urutan ASCENDING, pilih sitasi yang lebih sedikit.
         if (order == SORT_ASC)
         {
-            shouldPickA = (a->paper->citation_count <= b->paper->citation_count);
+            shouldPickA = (a->paper->citations <= b->paper->citations);
         }
         // Jika urutan DESCENDING, pilih sitasi yang lebih banyak.
         else
         {
-            shouldPickA = (a->paper->citation_count >= b->paper->citation_count);
+            shouldPickA = (a->paper->citations >= b->paper->citations);
         }
     }
 
@@ -312,7 +313,8 @@ void displaySearchResult(const SearchResult *result)
             printf("[%d] %s\n", i + 1, (strlen(p->title) > 0) ? p->title : "No Title");
             printf("    Author    : %s\n", (strlen(p->authors) > 0) ? p->authors : "Unknown");
             printf("    Tahun     : %d\n", p->year);
-            printf("    Sitasi    : %d\n", p->citation_count);
+            // PERBAIKAN: Gunakan 'citations' bukan 'citation_count'
+            printf("    Sitasi    : %d\n", p->citations);
             printf("    Bidang    : %s\n\n", (strlen(p->field_of_study) > 0) ? p->field_of_study : "Unknown");
         }
     }
@@ -322,6 +324,7 @@ void displaySearchResult(const SearchResult *result)
     }
     printf("======================================================\n");
 }
+
 void sort_papers_by_year(CitationNode** headRef, bool ascending)
 {
     SortOrder order = ascending ? SORT_ASC : SORT_DESC;
@@ -507,10 +510,11 @@ void sortPapersByCitations(Paper *papers, int count, bool ascending)
         for (int j = 0; j < count - i - 1; j++) {
             bool shouldSwap;
             
+            // PERBAIKAN: Gunakan 'citations' bukan 'citation_count'
             if (ascending) {
-                shouldSwap = (papers[j].citation_count > papers[j + 1].citation_count);
+                shouldSwap = (papers[j].citations > papers[j + 1].citations);
             } else {
-                shouldSwap = (papers[j].citation_count < papers[j + 1].citation_count);
+                shouldSwap = (papers[j].citations < papers[j + 1].citations);
             }
             
             if (shouldSwap) {
