@@ -503,8 +503,11 @@ Paper *convertCitationsToPaperList(CitationNode *citationHead, int *count)
             paperList[i].field_of_study[sizeof(paperList[i].field_of_study) - 1] = '\0';
 
             paperList[i].year = current->paper->year;
-            paperList[i].citations = current->paper->citations;
-            paperList[i].citation_count = current->paper->citation_count;
+            paperList[i].citations = current->paper->citations < 0 ? 0 : 
+            current->paper->citations; // Ensure non-negative citations
+            if (current->paper->citations < 0) {
+                printf("Warning: Negative citations found for paper '%s'. Setting to 0.\n", paperList[i].title);
+            }
 
             // Set up linked list pointers for sorting
             paperList[i].next = (i < *count - 1) ? &paperList[i + 1] : NULL;

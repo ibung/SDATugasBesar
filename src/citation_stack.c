@@ -16,8 +16,7 @@ Paper* createPaper(const char* title, const char* authors, int year, const char*
     strcpy(newPaper->authors, authors);
     newPaper->year = year;
     strcpy(newPaper->field_of_study, field_of_study);
-    newPaper->citations = citations;
-    newPaper->citation_count = citations; 
+    newPaper->citations = citations < 0 ? 0 : citations; 
     newPaper->citations_head = NULL; 
     newPaper->next = NULL;
     newPaper->prev = NULL;
