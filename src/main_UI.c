@@ -270,11 +270,11 @@ void handleSortingOptions(Paper *paperList, int count)
         printf(" Sorted by year (oldest first)\n");
         break;
     case 3:
-        sortPapersByCitations(paperList, count, true); // Most popular
+        sortPapersByCitations(paperList, count, false); // Most popular
         printf(" Sorted by citations (most popular)\n");
         break;
     case 4:
-        sortPapersByCitations(paperList, count, false); // Least popular
+        sortPapersByCitations(paperList, count, true); // Least popular
         printf(" Sorted by citations (least popular)\n");
         break;
     case 5:
@@ -356,7 +356,7 @@ void displayAllFields(PaperLoader *loader)
     printf("+=============================================================================+\n");
     printf("|                        FIELDS OF STUDY OVERVIEW                             |\n");
     printf("+-----------------------------------------------------------------------------+\n");
-    printf("| Field Name                    | Papers | Height | Balance | AVL Info        |\n");
+    printf("| Field Name                  |   Papers   |   Height   | Balance | AVL Info  |\n");
     printf("+=============================================================================+\n");
 
     if (displayChoice == 2)
@@ -370,7 +370,7 @@ void displayAllFields(PaperLoader *loader)
 
     printf("+=============================================================================+\n");
     printf("| STATISTIK:                                                                  |\n");
-    printf("|   - Total unique fields : %-3d                                              |\n", loader->totalFields);
+    printf("|   - Total unique fields  : %-3d                                              |\n", loader->totalFields);
     printf("|   - Total papers loaded  : %-4d                                             |\n", loader->totalPapers);
     printf("|   - AVL Tree structure   : Balanced untuk pencarian optimal                 |\n");
     printf("+=============================================================================+\n");

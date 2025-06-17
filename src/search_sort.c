@@ -510,11 +510,10 @@ void sortPapersByCitations(Paper *papers, int count, bool ascending)
         for (int j = 0; j < count - i - 1; j++) {
             bool shouldSwap;
             
-            // PERBAIKAN: Gunakan 'citations' bukan 'citation_count'
             if (ascending) {
-                shouldSwap = (papers[j].citations > papers[j + 1].citations);
+                shouldSwap = (papers[j].citation_count > papers[j + 1].citation_count);
             } else {
-                shouldSwap = (papers[j].citations < papers[j + 1].citations);
+                shouldSwap = (papers[j].citation_count < papers[j + 1].citation_count);
             }
             
             if (shouldSwap) {
