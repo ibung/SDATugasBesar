@@ -1,5 +1,5 @@
-#ifndef IBNU_DLLPagination_H
-#define IBNU_DLLPagination_H
+#ifndef Pagination_H
+#define Pagination_H
 
 #include "umum.h"
 // New pagination functions

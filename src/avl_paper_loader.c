@@ -207,7 +207,7 @@ void displayPapersByField(PaperLoader* loader, const char* fieldOfStudy) {
                strlen(paper->title) > 60 ? "..." : "");
         printf("  Author: %s\n", paper->authors);
         printf("  Tahun: %d\n", paper->year);
-        printf("  Citations: %d\n", paper->citations);
+        printf("  Citations: %d\n", paper->citation_count);
         printf("  Bidang: %s\n", paper->field_of_study);
         printf("   ────────────────────────────────────────\n");
         

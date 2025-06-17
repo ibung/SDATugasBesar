@@ -6,21 +6,10 @@
 #include "../include/search_sort.h"
 #include "../include/pagination.h"
 #include "../include/citation_stack.h"
-
-// Forward declarations
-void mainMenu(PaperLoader *loader);
-void searchByField(PaperLoader *loader);
-void displayAllFields(PaperLoader *loader);
-void displayAllPapersWithSorting(PaperLoader *loader);
-void undoSearch(PaperLoader *loader);
-Paper *convertCitationsToPaperList(CitationNode *citationHead, int *count);
-void handleSortingOptions(Paper *paperList, int count);
-void handlePagination(Paper *paperList, int count);
-void clearScreen();
-void pressEnterToContinue();
+#include "../include/main_UI.h"
 
 int main()
-{   
+{
     printf("=======================================================\n");
     printf("ACADEMIC PAPER CITATION MANAGEMENT SYSTEM\n");
     printf("=======================================================\n");
@@ -503,7 +492,6 @@ Paper *convertCitationsToPaperList(CitationNode *citationHead, int *count)
             paperList[i].field_of_study[sizeof(paperList[i].field_of_study) - 1] = '\0';
 
             paperList[i].year = current->paper->year;
-            paperList[i].citations = current->paper->citations;
             paperList[i].citation_count = current->paper->citation_count;
 
             // Set up linked list pointers for sorting
