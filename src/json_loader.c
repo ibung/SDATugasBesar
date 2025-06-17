@@ -1,7 +1,6 @@
 #include "../include/json_loader.h"
 #include "../include/avl_paper_loader.h"
 #include "../include/cJSON.h"
-#include "../include/citation_stack.h"
 
 PaperLoader* initPaperLoader() {
     PaperLoader* loader = (PaperLoader*)malloc(sizeof(PaperLoader));
@@ -100,21 +99,6 @@ int extractFieldsOfStudy(cJSON* fieldsArray, char fields[][150]) {
     return count;
 }
 
-// Tambahkan setelah fungsi extractFieldsOfStudy
-int countCitations(cJSON* jsonObject) {
-    cJSON* inCitationsArray = cJSON_GetObjectItem(jsonObject, "inCitations");
-    
-    if (inCitationsArray == NULL) {
-        return 0;
-    }
-    
-    if (!cJSON_IsArray(inCitationsArray)) {
-        return 0;
-    }
-    
-    return cJSON_GetArraySize(inCitationsArray);
-}
-
 // FIXED: Parse JSON object menjadi JSONPaper
 JSONPaper* parseJSONPaper(cJSON* jsonObject) {
     if (jsonObject == NULL) {
@@ -145,23 +129,14 @@ JSONPaper* parseJSONPaper(cJSON* jsonObject) {
     paper->fieldCount = extractFieldsOfStudy(fieldsArray, paper->fieldsOfStudy);
     
     // FIXED: Extract citation count from inCitations array
-    paper->citationCount = countCitations(jsonObject);
+    cJSON* inCitationsArray = cJSON_GetObjectItem(jsonObject, "inCitations");
+    if (cJSON_IsArray(inCitationsArray)) {
+        paper->citationCount = cJSON_GetArraySize(inCitationsArray);
+    } else {
+        paper->citationCount = 0;
+    }
     
     return paper;
-}
-
-Paper* convertJSONPaperToPaper(JSONPaper* jsonPaper) {
-    if (jsonPaper == NULL) return NULL;
-
-    const char* field = (jsonPaper->fieldCount > 0) ? jsonPaper->fieldsOfStudy[0] : "General";
-
-    return createPaper(
-        jsonPaper->title,
-        jsonPaper->authors,
-        jsonPaper->year,
-        field,
-        jsonPaper->citationCount
-    );
 }
 
 // FIXED: Load data dari file JSON Array format
@@ -255,7 +230,7 @@ int loadJSONData(PaperLoader* loader, const char* filename) {
         
         // Limit untuk testing (hapus jika ingin load semua)
         if (paperCount >= 1000) {
-            printf("Limiting to first 1000 papers for testing...\n");
+            printf("Limiting to first 100 papers for testing...\n");
             break;
         }
     }
