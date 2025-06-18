@@ -64,11 +64,9 @@ AVLNode* createAVLNode(const char* fieldOfStudy) {
 
 // Insert paper ke AVL Tree berdasarkan bidang studi
 AVLNode* insertToAVL(AVLNode* root, Paper* paper) {
-    // 1. Lakukan BST insertion biasa
     if (root == NULL) {
         AVLNode* newNode = createAVLNode(paper->field_of_study);
         
-        // Buat CitationNode untuk paper ini
         CitationNode* citationNode = (CitationNode*)malloc(sizeof(CitationNode));
         citationNode->paper = paper;
         citationNode->next = NULL;
@@ -102,8 +100,7 @@ AVLNode* insertToAVL(AVLNode* root, Paper* paper) {
     }
     
     // 2. Update tinggi node
-    root->height = 1 + ((getHeight(root->left) > getHeight(root->right)) ? 
-                        getHeight(root->left) : getHeight(root->right));
+    root->height = 1 + ((getHeight(root->left) > getHeight(root->right)) ? getHeight(root->left) : getHeight(root->right));
     
     // 3. Cek balance factor
     int balance = getBalance(root);
@@ -156,7 +153,7 @@ AVLNode* findFieldInAVL(AVLNode* root, const char* fieldOfStudy) {
 void displayFieldsInOrderAscending(AVLNode* root) {
     if (root != NULL) {
         displayFieldsInOrderAscending(root->left);
-        printf("%-25s | Papers: %2d | Height: %d | Balance: %2d\n", 
+        printf("| %-25s   | Papers: %3d | Height: %d | Balance: %2d         |\n",  
                root->fieldOfStudy, root->paperCount, root->height, getBalance(root));
         displayFieldsInOrderAscending(root->right);
     }
@@ -166,7 +163,7 @@ void displayFieldsInOrderAscending(AVLNode* root) {
 void displayFieldsInOrderDescending(AVLNode* root) {
     if (root != NULL) {
         displayFieldsInOrderDescending(root->right);
-        printf("%-25s | Papers: %2d | Height: %d | Balance: %2d\n", 
+        printf("| %-25s   | Papers: %3d | Height: %d | Balance: %2d         |\n", 
                root->fieldOfStudy, root->paperCount, root->height, getBalance(root));
         displayFieldsInOrderDescending(root->left);
     }
@@ -210,7 +207,7 @@ void displayPapersByField(PaperLoader* loader, const char* fieldOfStudy) {
                strlen(paper->title) > 60 ? "..." : "");
         printf("  Author: %s\n", paper->authors);
         printf("  Tahun: %d\n", paper->year);
-        printf("  Citations: %d\n", paper->citations);
+        printf("  Citations: %d\n", paper->citation_count);
         printf("  Bidang: %s\n", paper->field_of_study);
         printf("   ────────────────────────────────────────\n");
         

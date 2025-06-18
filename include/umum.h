@@ -17,7 +17,8 @@ typedef struct Paper {
     char authors[100];
     char field_of_study[100];
     int year;
-    int citations;              // Gunakan field ini saja
+    int citations;
+    int citation_count;  // Total citations from inCitations
     Citation* citations_head;
     struct Paper* next;
     struct Paper* prev;

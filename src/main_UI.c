@@ -6,18 +6,7 @@
 #include "../include/search_sort.h"
 #include "../include/pagination.h"
 #include "../include/citation_stack.h"
-
-// Forward declarations
-void mainMenu(PaperLoader *loader);
-void searchByField(PaperLoader *loader);
-void displayAllFields(PaperLoader *loader);
-void displayAllPapersWithSorting(PaperLoader *loader);
-void undoSearch(PaperLoader *loader);
-Paper *convertCitationsToPaperList(CitationNode *citationHead, int *count);
-void handleSortingOptions(Paper *paperList, int count);
-void handlePagination(Paper *paperList, int count);
-void clearScreen();
-void pressEnterToContinue();
+#include "../include/main_UI.h"
 
 int main()
 {
@@ -281,11 +270,11 @@ void handleSortingOptions(Paper *paperList, int count)
         printf(" Sorted by year (oldest first)\n");
         break;
     case 3:
-        sortPapersByCitations(paperList, count, true); // Most popular
+        sortPapersByCitations(paperList, count, false); // Most popular
         printf(" Sorted by citations (most popular)\n");
         break;
     case 4:
-        sortPapersByCitations(paperList, count, false); // Least popular
+        sortPapersByCitations(paperList, count, true); // Least popular
         printf(" Sorted by citations (least popular)\n");
         break;
     case 5:
@@ -367,7 +356,7 @@ void displayAllFields(PaperLoader *loader)
     printf("+=============================================================================+\n");
     printf("|                        FIELDS OF STUDY OVERVIEW                             |\n");
     printf("+-----------------------------------------------------------------------------+\n");
-    printf("| Field Name                    | Papers | Height | Balance | AVL Info        |\n");
+    printf("| Field Name                  |   Papers   |   Height   | Balance | AVL Info  |\n");
     printf("+=============================================================================+\n");
 
     if (displayChoice == 2)
@@ -381,7 +370,7 @@ void displayAllFields(PaperLoader *loader)
 
     printf("+=============================================================================+\n");
     printf("| STATISTIK:                                                                  |\n");
-    printf("|   - Total unique fields : %-3d                                              |\n", loader->totalFields);
+    printf("|   - Total unique fields  : %-3d                                              |\n", loader->totalFields);
     printf("|   - Total papers loaded  : %-4d                                             |\n", loader->totalPapers);
     printf("|   - AVL Tree structure   : Balanced untuk pencarian optimal                 |\n");
     printf("+=============================================================================+\n");
@@ -503,7 +492,7 @@ Paper *convertCitationsToPaperList(CitationNode *citationHead, int *count)
             paperList[i].field_of_study[sizeof(paperList[i].field_of_study) - 1] = '\0';
 
             paperList[i].year = current->paper->year;
-            paperList[i].citations = current->paper->citations;
+            paperList[i].citation_count = current->paper->citation_count;
 
             // Set up linked list pointers for sorting
             paperList[i].next = (i < *count - 1) ? &paperList[i + 1] : NULL;

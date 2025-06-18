@@ -17,7 +17,11 @@ Paper* createPaper(const char* title, const char* authors, int year, const char*
     newPaper->year = year;
     strcpy(newPaper->field_of_study, field_of_study);
     newPaper->citations = citations;
+    newPaper->citation_count = citations;
+    printf("DEBUG: Creating paper '%s' with citation_count = %d\n", title, citations);
     newPaper->next = NULL;
+    newPaper->prev = NULL;
+    newPaper->citations_head = NULL; 
     return newPaper;
 }
 
@@ -111,7 +115,7 @@ void displayCitations(CitationManager* manager) {
         Paper* paper = current->paper;
         // Format citation akademik dengan bidang studi
         printf("[%d] %s (%d). %s. Bidang Studi: %s. Citations: %d\n", 
-               index, paper->authors, paper->year, paper->title, paper->field_of_study, paper->citations);
+               index, paper->authors, paper->year, paper->title, paper->field_of_study, paper->citation_count);
         printf("    ------------------------\n");
         
         current = current->next;

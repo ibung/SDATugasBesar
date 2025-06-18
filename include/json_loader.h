@@ -34,8 +34,10 @@ typedef struct PaperLoader {
 PaperLoader* initPaperLoader();
 int loadJSONData(PaperLoader* loader, const char* filename);
 JSONPaper* parseJSONPaper(cJSON* jsonObject);
+Paper* convertJSONPaperToPaper(JSONPaper* jsonPaper);
 void extractFirstAuthor(cJSON* authorsArray, char* result);
 int extractFieldsOfStudy(cJSON* fieldsArray, char fields[][150]);
+int countCitations(cJSON* cJSONObject);
 void trimWhitespace(char* str);
 char* getJSONString(cJSON* json, const char* key, const char* defaultValue);
 int getJSONInt(cJSON* json, const char* key, int defaultValue);
